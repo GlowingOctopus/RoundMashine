@@ -72,7 +72,7 @@ Detection detection(TRIGGER_PIN_FORWARD, TRIGGER_PIN_ANGLED, TRIGGER_PIN_LEFT, E
 Command input;  //stores human inputs
 
 void setup() {
-	Serial.begin(9600);
+  Serial.begin(9600);
   pinMode(13, OUTPUT);
 }
 
@@ -85,7 +85,7 @@ bool failSafeCheck() {
   }
 
 void manual() {
-	//Serial.println("start manual");
+  //Serial.println("start manual");
   while (!HuI.checkBT()) {} //wait for a command
 
   input = HuI.getInput(); //store input
@@ -110,15 +110,16 @@ void manual() {
     }
     else digitalWrite(13, HIGH);
 
-	//check for new input
-	if (HuI.checkBT()) {
-		input = HuI.getInput();
-	}
+  //check for new input
+  if (HuI.checkBT()) {
+    input = HuI.getInput();
+  }
+  
   }
 }
 
 void automatic() {
-	//Serial.println("start auto");
+  //Serial.println("start auto");
   while (input != Command::Grab) {  //stay in auto mode until the Grab command is recieved
 
     //take readings from sensors
@@ -144,10 +145,10 @@ void automatic() {
   
     drive.drive(MAX_POWER);
 
-	//check for new input
-	if (HuI.checkBT()) {
-		input = HuI.getInput();
-	}
+  //check for new input
+  if (HuI.checkBT()) {
+    input = HuI.getInput();
+  }
   }
 }
 
