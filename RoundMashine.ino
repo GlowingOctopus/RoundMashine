@@ -98,13 +98,18 @@ void manual() {
   input = HuI.getInput(); //store input
   
   while (input != Command::Release) { //stay in manual mode until the Release command is recieved
-
-    if (failSafeCheck()){
-      digitalWrite(13, LOW);
-      switch (input) {
+    switch (input) {
         case Command::Forwards:
-          drive.drive(100);
-          break;
+            if (failSafeCheck()){
+              digitalWrite(13, LOW);
+              drive.drive(100);
+            }
+            else {
+              digitalWrite(13, HIGH);
+              drive.stop_movement();
+              delay(15);
+            }
+            break;
         case Command::Left:
           drive.turn(true, -20);
           break;
@@ -114,14 +119,11 @@ void manual() {
         default:
           drive.stop_movement();
       }
-    }
-    else digitalWrite(13, HIGH);
 
-  //check for new input
-  if (HuI.checkBT()) {
-    input = HuI.getInput();
-  }
-  
+    //check for new input
+    if (HuI.checkBT()) {
+      input = HuI.getInput();
+    }
   }
 }
 

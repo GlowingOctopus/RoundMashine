@@ -156,7 +156,7 @@ Detection::Detection(int trigForward, int trigAngled, int trigLeft, int echoForw
 
 int Detection::getDistance(sensorID ID) {
 	if (ID == sensorID::Front){
-		int travelTime = forwardSonar.ping_median(3);
+		int travelTime = forwardSonar.ping_median(1);
     int dist = forwardSonar.convert_cm(travelTime) - FORWARD_SENSOR_OFFSET;
     if (dist == 0) dist = 200;
     return dist;
