@@ -5,10 +5,11 @@
 
 #include <SoftwareSerial.h>
 #include <NewPing.h>
+
 #ifdef COMPASS
 #include <Wire.h>
 #include <HMC5883L_Simple.h>
-#define COMPASS_ADDRESS 0x1E //0011110b, I2C 7bit address of HMC5883
+//#define COMPASS_ADDRESS 0x1E //0011110b, I2C 7bit address of HMC5883
 #endif // COMPASS
 
 
@@ -17,9 +18,9 @@
 
 #define DISTANCE_TO_WALL 2        //aim to keep this gap to the wall
 #define CHASSIS_DIAMETER 10
-#define FORWARD_SENSOR_OFFSET 1   //distance between edge of chassis and sensor. default: 4
-#define LEFT_SENSOR_OFFSET  6     //distance between edge of chassis and sensor. default: 4
-#define ANGLED_SENSOR_OFFSET  0   //distance between edge of chassis and sensor. default: 3
+#define FORWARD_SENSOR_OFFSET 1   //distance between edge of chassis and sensor. default: 8
+#define LEFT_SENSOR_OFFSET  6     //distance between edge of chassis and sensor. default: 8
+#define ANGLED_SENSOR_OFFSET  0   //distance between edge of chassis and sensor. default: 8
 
 const double wheelDifRatio =  DISTANCE_TO_WALL / (DISTANCE_TO_WALL + CHASSIS_DIAMETER);
 
@@ -33,15 +34,17 @@ private:
   void leftWheel(int _speed);
   void rightWheel(int _speed);
 
-  int getOrientation();
-
   int leftMotor1;
   int leftMotor2;
   int rightMotor1;
   int rightMotor2;
 
-  int oldOrientation;
-  int time;
+  #ifdef COMPASS
+  HMC5883L_Simple Compass;
+  float startOrientation;
+
+  //int getOrientation();
+  #endif //COMPASS
 
 public:
   void turn(bool onSpot, int _degrees);

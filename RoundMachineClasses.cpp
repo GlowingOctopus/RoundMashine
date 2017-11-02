@@ -4,11 +4,13 @@ void Movement::turn(bool onSpot, int _degrees) {
 
 	if (_degrees != 0) {
 		#ifdef COMPASS
-		startOrientation = getOrientation();
+		startOrientation = Compass.GetHeadingDegrees();
+   Serial.print("start heading");
+   Serial.println(startOrientation);
 		if (onSpot) {
 			// turn anticlockwise
 			if (_degrees < 0) {
-				while (getOrientation() > startOrientation + _degrees) { 
+				while (Compass.GetHeadingDegrees() > startOrientation + _degrees) { 
 					leftWheel(-MAX_POWER);
 					rightWheel(MAX_POWER);
 				}
@@ -16,7 +18,8 @@ void Movement::turn(bool onSpot, int _degrees) {
 
 			// turn clockwise
 			else {
-				while (getOrientation() < startOrientation + _degrees) {
+				while (Compass.GetHeadingDegrees() < startOrientation + _degrees) {
+        Serial.println(Compass.GetHeadingDegrees());
 					leftWheel(MAX_POWER);
 					rightWheel(-MAX_POWER);
 				}
@@ -26,7 +29,7 @@ void Movement::turn(bool onSpot, int _degrees) {
 		else {    //turning around point (pivot turning)
 				  //turn anticlockwise
 			if (_degrees < 0) {
-				while (getOrientation() > startOrientation + _degrees) {
+				while (Compass.GetHeadingDegrees() > startOrientation + _degrees) {
 					leftWheel(MAX_POWER * wheelDifRatio);
 					rightWheel(MAX_POWER);
 				}
@@ -34,7 +37,7 @@ void Movement::turn(bool onSpot, int _degrees) {
 
 			//turn clockwise
 			else {
-				while (getOrientation() < startOrientation + _degrees) {
+				while (Compass.GetHeadingDegrees() < startOrientation + _degrees) {
 					leftWheel(MAX_POWER);
 					rightWheel(MAX_POWER * wheelDifRatio);
 				}
@@ -136,18 +139,23 @@ Movement::Movement(int L1, int L2, int R1, int R2) {
   digitalWrite(rightMotor2, 0);
 
 #ifdef COMPASS
+  
   Wire.begin();
-  HMC5883L_Simple Compass;
-  Compass.SetSamplingMode(COMPASS_CONTINUOUS);
+  Compass.SetDeclination(12, 24, 'E');
+  Compass.SetSamplingMode(COMPASS_SINGLE);
+  Compass.SetScale(COMPASS_SCALE_130);  
+  Compass.SetOrientation(COMPASS_HORIZONTAL_X_NORTH);
+
 #endif // COMPASS
 }
 
-#ifdef COMPASS
+/*#ifdef COMPASS
 int Movement::getOrientation() {
-	float angle= Compass.GetHeadingDegrees();
+	float angle = Compass.GetHeadingDegrees();
+  Serial.print(angle);
 	return angle;
 }
-#endif
+#endif //COMPASS */
 
 Detection::Detection(int trigForward, int trigAngled, int trigLeft, int echoForward, int echoAngled, int echoLeft, int maxDist) : forwardSonar(trigForward, echoForward, maxDist), angledSonar(trigAngled, echoAngled, maxDist), leftSonar(trigLeft, echoLeft, maxDist) 
 {

@@ -42,6 +42,11 @@ RIGHT MOTOR ARDUINO
 ===LEDs===
 RED <--> 13
 GREEN <--> 2
+
+COMPASS
+SCL <--> SCL (A5)
+SDA <---> SDA (A4)
+
 */
 
 //HARDWARE CONNECTIONS//
@@ -76,11 +81,14 @@ HumanInterface HuI(SORTWARE_SERIAL_RX, SORTWARE_SERIAL_TX); //BT rx,tx
 Movement drive(LEFT_MOTOR_1, LEFT_MOTOR_2, RIGHT_MOTOR_1, RIGHT_MOTOR_2); 
 Detection detection(TRIGGER_PIN_FORWARD, TRIGGER_PIN_ANGLED, TRIGGER_PIN_LEFT, ECHO_PIN_FORWARD, ECHO_PIN_ANGLED, ECHO_PIN_LEFT, MAX_DISTANCE); 
 
+
 Command input;  //stores human inputs
 
-void setup() {
+void setup() {  
   Serial.begin(9600);
   pinMode(13, OUTPUT);
+  Serial.print("Setup");
+  Serial.println(Compass.GetHeadingDegrees());
 }
 
 bool failSafeCheck() {
@@ -162,12 +170,16 @@ void automatic() {
 }
 
 void loop() {
+  /*Serial.print("Start.\nonSpot = true, right 90d\n");
+  drive.turn(true, 90);
+  delay(1000);
+  Serial.print("onSpot = true, left 90d");
+  drive.turn(true, -90);
+  delay(1000);
+  drive.turn(false, 90);
+  delay(1000);
+  drive.turn(false, -90);
+  delay(1000);*/
   manual();
   automatic();
-  /*Serial.print("Left: ");
-  Serial.println(detection.getDistance(sensorID::Left));
-  Serial.print("Front: ");
-  Serial.println(detection.getDistance(sensorID::Front));
-  Serial.print("Angled: ");
-  Serial.println(detection.getDistance(sensorID::Angled));*/
 }
