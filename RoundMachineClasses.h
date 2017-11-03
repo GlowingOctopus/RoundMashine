@@ -1,7 +1,7 @@
 #ifndef ROUNDMACHINE_H
 #define ROUNDMACHINE_H
 
-//#define COMPASS
+#define COMPASS
 
 #include <SoftwareSerial.h>
 #include <NewPing.h>
@@ -9,7 +9,6 @@
 #ifdef COMPASS
 #include <Wire.h>
 #include <HMC5883L_Simple.h>
-//#define COMPASS_ADDRESS 0x1E //0011110b, I2C 7bit address of HMC5883
 #endif // COMPASS
 
 
@@ -53,6 +52,8 @@ public:
   void drive(int leftSpeed, int rightSpeed);
 
   Movement(int L1, int L2, int R1, int R2);
+
+
 };
 
 class Detection {

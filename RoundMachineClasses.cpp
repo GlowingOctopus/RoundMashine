@@ -1,5 +1,30 @@
 #include "RoundMachineClasses.h"
 
+Movement::Movement(int L1, int L2, int R1, int R2) {
+  leftMotor1 = L1;
+  leftMotor2 = L2;
+  rightMotor1 = R1;
+  rightMotor2 = R2;
+
+  pinMode(leftMotor1, OUTPUT);
+  pinMode(leftMotor2, OUTPUT);
+  pinMode(rightMotor1, OUTPUT);
+  pinMode(rightMotor2, OUTPUT);
+
+  digitalWrite(leftMotor1, 0);
+  digitalWrite(leftMotor2, 0);
+  digitalWrite(rightMotor1, 0);
+  digitalWrite(rightMotor2, 0);
+
+  Wire.begin();
+  /*
+  Compass.SetDeclination(12, 24, 'E');
+  Compass.SetSamplingMode(COMPASS_SINGLE);
+  Compass.SetScale(COMPASS_SCALE_130);  
+  Compass.SetOrientation(COMPASS_HORIZONTAL_X_NORTH);
+  */
+}
+
 void Movement::turn(bool onSpot, int _degrees) {
 
 	if (_degrees != 0) {
@@ -122,32 +147,6 @@ void Movement::rightWheel(int _speed) {
   }
 }
 
-Movement::Movement(int L1, int L2, int R1, int R2) {
-  leftMotor1 = L1;
-  leftMotor2 = L2;
-  rightMotor1 = R1;
-  rightMotor2 = R2;
-
-  pinMode(leftMotor1, OUTPUT);
-  pinMode(leftMotor2, OUTPUT);
-  pinMode(rightMotor1, OUTPUT);
-  pinMode(rightMotor2, OUTPUT);
-
-  digitalWrite(leftMotor1, 0);
-  digitalWrite(leftMotor2, 0);
-  digitalWrite(rightMotor1, 0);
-  digitalWrite(rightMotor2, 0);
-
-#ifdef COMPASS
-  
-  Wire.begin();
-  Compass.SetDeclination(12, 24, 'E');
-  Compass.SetSamplingMode(COMPASS_SINGLE);
-  Compass.SetScale(COMPASS_SCALE_130);  
-  Compass.SetOrientation(COMPASS_HORIZONTAL_X_NORTH);
-
-#endif // COMPASS
-}
 
 /*#ifdef COMPASS
 int Movement::getOrientation() {
