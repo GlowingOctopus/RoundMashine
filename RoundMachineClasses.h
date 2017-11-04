@@ -13,13 +13,14 @@
 
 
 #define BLOCK_IN_CM 26
-#define MAX_POWER 255
+#define MAX_POWER 180   //default 255
 
 #define DISTANCE_TO_WALL 2        //aim to keep this gap to the wall
 #define CHASSIS_DIAMETER 10
 #define FORWARD_SENSOR_OFFSET 1   //distance between edge of chassis and sensor. default: 8
 #define LEFT_SENSOR_OFFSET  6     //distance between edge of chassis and sensor. default: 8
 #define ANGLED_SENSOR_OFFSET  0   //distance between edge of chassis and sensor. default: 8
+
 
 const double wheelDifRatio =  DISTANCE_TO_WALL / (DISTANCE_TO_WALL + CHASSIS_DIAMETER);
 
@@ -41,6 +42,7 @@ private:
   #ifdef COMPASS
   HMC5883L_Simple Compass;
   float startOrientation;
+  float targetOrientation;
 
   //int getOrientation();
   #endif //COMPASS

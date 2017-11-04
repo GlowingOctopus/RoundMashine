@@ -30,21 +30,30 @@ void Movement::turn(bool onSpot, int _degrees) {
 	if (_degrees != 0) {
 		#ifdef COMPASS
 		startOrientation = Compass.GetHeadingDegrees();
-   Serial.print("start heading");
+   Serial.print("Start Orientation: ");
    Serial.println(startOrientation);
+   Serial.print("_degrees: ");
+   Serial.println(_degrees);
 		if (onSpot) {
 			// turn anticlockwise
 			if (_degrees < 0) {
-				while (Compass.GetHeadingDegrees() > startOrientation + _degrees) { 
+        if (startOrientation + _degrees < 0) {targetOrientation = startOrientation + _degrees + 360;}
+        else {targetOrientation = startOrientation + _degrees;}
+        Serial.print("target orientation: ");
+        Serial.println(targetOrientation);
+				while (Compass.GetHeadingDegrees() > targetOrientation || (Compass.GetHeadingDegrees() > startOrientation + _degrees && Compass.GetHeadingDegrees() < startOrientation + 3)) { 
 					leftWheel(-MAX_POWER);
 					rightWheel(MAX_POWER);
+          Serial.print("Current orientation: ");
+          Serial.println(Compass.GetHeadingDegrees());
 				}
 			}
 
 			// turn clockwise
 			else {
-				while (Compass.GetHeadingDegrees() < startOrientation + _degrees) {
-        Serial.println(Compass.GetHeadingDegrees());
+        if (startOrientation + _degrees > 360) targetOrientation = startOrientation + _degrees - 360;
+        else targetOrientation = startOrientation + _degrees;
+				while (Compass.GetHeadingDegrees() < targetOrientation || (Compass.GetHeadingDegrees() < startOrientation + _degrees && Compass.GetHeadingDegrees() > startOrientation - 3)) {
 					leftWheel(MAX_POWER);
 					rightWheel(-MAX_POWER);
 				}
@@ -54,7 +63,9 @@ void Movement::turn(bool onSpot, int _degrees) {
 		else {    //turning around point (pivot turning)
 				  //turn anticlockwise
 			if (_degrees < 0) {
-				while (Compass.GetHeadingDegrees() > startOrientation + _degrees) {
+				if (startOrientation + _degrees < 0) targetOrientation = startOrientation + _degrees + 360;
+        else targetOrientation = startOrientation + _degrees;
+        while (Compass.GetHeadingDegrees() > targetOrientation || (Compass.GetHeadingDegrees() > startOrientation + _degrees && Compass.GetHeadingDegrees() < startOrientation + 3)) { 
 					leftWheel(MAX_POWER * wheelDifRatio);
 					rightWheel(MAX_POWER);
 				}
@@ -62,7 +73,9 @@ void Movement::turn(bool onSpot, int _degrees) {
 
 			//turn clockwise
 			else {
-				while (Compass.GetHeadingDegrees() < startOrientation + _degrees) {
+				if (startOrientation + _degrees > 360) targetOrientation = startOrientation + _degrees - 360;
+        else targetOrientation = startOrientation + _degrees;
+        while (Compass.GetHeadingDegrees() < targetOrientation || (Compass.GetHeadingDegrees() < startOrientation + _degrees && Compass.GetHeadingDegrees() > startOrientation - 3)) {
 					leftWheel(MAX_POWER);
 					rightWheel(MAX_POWER * wheelDifRatio);
 				}

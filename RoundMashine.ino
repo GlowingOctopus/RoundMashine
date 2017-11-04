@@ -110,7 +110,7 @@ void manual() {
         case Command::Forwards:
             if (failSafeCheck()){
               digitalWrite(13, LOW);
-              drive.drive(100);
+              drive.drive(MAX_POWER);
             }
             else {
               digitalWrite(13, HIGH);
@@ -119,10 +119,10 @@ void manual() {
             }
             break;
         case Command::Left:
-          drive.turn(true, -20);
+          drive.turn(true, -90);
           break;
         case Command::Right:
-          drive.turn(true, 20);
+          drive.turn(true, 90);
           break;
         default:
           drive.stop_movement();
@@ -170,16 +170,6 @@ void automatic() {
 }
 
 void loop() {
-  Serial.print("Start.\nonSpot = true, right 90d\n");
-  drive.turn(true, 90);
-  delay(1000);
-  Serial.print("onSpot = true, left 90d");
-  drive.turn(true, -90);
-  delay(1000);
-  drive.turn(false, 90);
-  delay(1000);
-  drive.turn(false, -90);
-  delay(1000);
-  //manual();
-  //automatic();
+  manual();
+  automatic();
 }
