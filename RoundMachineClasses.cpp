@@ -1,22 +1,28 @@
 #include "RoundMachineClasses.h"
 
+//Movement constructor (called when a movement object is created
 Movement::Movement(int L1, int L2, int R1, int R2) {
+  //define the motor outputs
   leftMotor1 = L1;
   leftMotor2 = L2;
   rightMotor1 = R1;
   rightMotor2 = R2;
 
+  //set up the pins
   pinMode(leftMotor1, OUTPUT);
   pinMode(leftMotor2, OUTPUT);
   pinMode(rightMotor1, OUTPUT);
   pinMode(rightMotor2, OUTPUT);
 
+  //make sure the motors are off
   digitalWrite(leftMotor1, 0);
   digitalWrite(leftMotor2, 0);
   digitalWrite(rightMotor1, 0);
   digitalWrite(rightMotor2, 0);
 
-  Wire.begin();
+  #ifdef COMPASS
+  Wire.begin();   //get the arduino ready for I2C comunication with the compass
+  #endif
   /*
   Compass.SetDeclination(12, 24, 'E');
   Compass.SetSamplingMode(COMPASS_SINGLE);
@@ -25,23 +31,25 @@ Movement::Movement(int L1, int L2, int R1, int R2) {
   */
 }
 
+//turn function. onSpot dictates if the robot pivots "on the spot" or around a point on the same side as it is turning towards. _degrees is the angle to turn, - = left, + = right
 void Movement::turn(bool onSpot, int _degrees) {
 
 	if (_degrees != 0) {
 		#ifdef COMPASS
-		startOrientation = Compass.GetHeadingDegrees();
+		startOrientation = Compass.GetHeadingDegrees(); //find out the orientation before the turn starts
    Serial.print("Start Orientation: ");
    Serial.println(startOrientation);
    Serial.print("_degrees: ");
    Serial.println(_degrees);
 		if (onSpot) {
-			// turn anticlockwise
+			// if turn anticlockwise
 			if (_degrees < 0) {
-        if (startOrientation + _degrees < 0) {targetOrientation = startOrientation + _degrees + 360;}
+        //target orientation must be between 0 - 360
+        if (startOrientation + _degrees < 0) {targetOrientation = startOrientation + _degrees + 360;} 
         else {targetOrientation = startOrientation + _degrees;}
         Serial.print("target orientation: ");
         Serial.println(targetOrientation);
-				while (Compass.GetHeadingDegrees() > targetOrientation || (Compass.GetHeadingDegrees() > startOrientation + _degrees && Compass.GetHeadingDegrees() < startOrientation + 3)) { 
+				while (Compass.GetHeadingDegrees() > targetOrientation || (Compass.GetHeadingDegrees() > startOrientation + _degrees && Compass.GetHeadingDegrees() < startOrientation + 3)) { //turn until the target orientation is reached
 					leftWheel(-MAX_POWER);
 					rightWheel(MAX_POWER);
           Serial.print("Current orientation: ");
@@ -49,7 +57,7 @@ void Movement::turn(bool onSpot, int _degrees) {
 				}
 			}
 
-			// turn clockwise
+			// if turn clockwise
 			else {
         if (startOrientation + _degrees > 360) targetOrientation = startOrientation + _degrees - 360;
         else targetOrientation = startOrientation + _degrees;
@@ -90,14 +98,14 @@ void Movement::turn(bool onSpot, int _degrees) {
 			if (_degrees < 0) {
 				leftWheel(-MAX_POWER);
 				rightWheel(MAX_POWER);
-				delay(-_degrees * experimentalNumber);
+				delay(-_degrees * turnSpeed);
 			}
 
 			// turn clockwise
 			else {
 				leftWheel(MAX_POWER);
 				rightWheel(-MAX_POWER);
-				delay(_degrees * experimentalNumber);
+				delay(_degrees * turnSpeed);
 			}
 		}
 
@@ -106,31 +114,34 @@ void Movement::turn(bool onSpot, int _degrees) {
 			if (_degrees < 0) {
 				leftWheel(MAX_POWER * wheelDifRatio);
 				rightWheel(MAX_POWER);
-				delay(-_degrees * experimentalNumber);
+				delay(-_degrees * turnSpeed);
 			}
 
 			//turn clockwise
 			else {
 				leftWheel(MAX_POWER);
 				rightWheel(MAX_POWER * wheelDifRatio);
-				delay(_degrees * experimentalNumber);
+				delay(_degrees * turnSpeed);
 			}
 		}
 		#endif //not COMPASS
 	}
 }
 
+//stop the robot
 void Movement::stop_movement() {
 	leftWheel(0);
 	rightWheel(0);
 }
 
+//drive the robot forwards
 void Movement::drive(int _speed) {
 	leftWheel(_speed);
 	rightWheel(_speed);
 
 }
 
+//drive the robot forwards with individual control over both motors
 void Movement::drive(int leftSpeed, int rightSpeed) {
 	leftWheel(leftSpeed);
 	rightWheel(rightSpeed);
@@ -160,43 +171,36 @@ void Movement::rightWheel(int _speed) {
   }
 }
 
-
-/*#ifdef COMPASS
-int Movement::getOrientation() {
-	float angle = Compass.GetHeadingDegrees();
-  Serial.print(angle);
-	return angle;
-}
-#endif //COMPASS */
-
+//Detection constructor sets up ultrasonic sensors
 Detection::Detection(int trigForward, int trigAngled, int trigLeft, int echoForward, int echoAngled, int echoLeft, int maxDist) : forwardSonar(trigForward, echoForward, maxDist), angledSonar(trigAngled, echoAngled, maxDist), leftSonar(trigLeft, echoLeft, maxDist) 
 {
   
 }
 
+//get the distance from a sensor
 int Detection::getDistance(sensorID ID) {
 	if (ID == sensorID::Front){
-		int travelTime = forwardSonar.ping_median(1);
-    int dist = forwardSonar.convert_cm(travelTime) - FORWARD_SENSOR_OFFSET;
-    if (dist == 0) dist = 200;
+		int travelTime = forwardSonar.ping_median(1);   //smooth the results by taking a median
+    int dist = forwardSonar.convert_cm(travelTime) - FORWARD_SENSOR_OFFSET;   //subtract the offset
+    if (dist == 0) dist = maxDist;  //New ping returns 0 if distance is greater than maxDist. In this case, we want to retun maxDist
     return dist;
 	}
 	if (ID == sensorID::Left) {
-    int travelTime = leftSonar.ping_median(3);
-    int dist = leftSonar.convert_cm(travelTime) - LEFT_SENSOR_OFFSET;
-    if (dist == 0) dist = 200;
+    int travelTime = leftSonar.ping_median(3);  //smooth the results by taking a median
+    int dist = leftSonar.convert_cm(travelTime) - LEFT_SENSOR_OFFSET; //subtract the offset
+    if (dist == 0) dist = maxDist;  //New ping returns 0 if distance is greater than maxDist. In this case, we want to retun maxDist
     return dist;
 	}
 	if (ID == sensorID::Angled) {
-    int travelTime = angledSonar.ping_median(3);
-		int dist = angledSonar.convert_cm(travelTime) - ANGLED_SENSOR_OFFSET;
-    if (dist == 0) dist = 200;
+    int travelTime = angledSonar.ping_median(3);  //smooth the results by taking a median
+		int dist = angledSonar.convert_cm(travelTime) - ANGLED_SENSOR_OFFSET; //subtract the offset
+    if (dist == 0) dist = maxDist;  //New ping returns 0 if distance is greater than maxDist. In this case, we want to retun maxDist
     return dist;
 	}
 }
-
+  //check if a new command is available over BT
 bool HumanInterface::checkBT() {
-	if (BTSerial.available() > 0) {
+	if (BTSerial.available() > 0 || MODE_BUTTON == HIGH) {
 		return true;
 	}
 	else { 
@@ -204,8 +208,12 @@ bool HumanInterface::checkBT() {
 	}
 }
 
+//translate a command and return it
 Command HumanInterface::getInput() {
+
+  // try catch this line to see if button has been pressed
 	char key = BTSerial.read();
+ 
 	Command input;
 	switch (key) {
 		case 0x38:
@@ -236,6 +244,7 @@ Command HumanInterface::getInput() {
 	return input;
 }
 
+//HumanInterface constructor. It starts the serial port for the BT
 HumanInterface::HumanInterface(int rx, int tx) : BTSerial(rx, tx) {
   BTSerial.begin(9600);
 }

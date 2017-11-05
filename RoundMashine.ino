@@ -24,11 +24,11 @@ Trigger <-->  12
 
 ANGLED
 Echo  <-->  4
-Trigger <-->  12
+Trigger <-->  A0
 
 LEFT
 Echo  <-->  8
-Trigger <-->  12
+Trigger <-->  A1
 
 ===Motors===
 LEFT MOTOR  ARDUINO
@@ -42,6 +42,10 @@ RIGHT MOTOR ARDUINO
 ===LEDs===
 RED <--> 13
 GREEN <--> 2
+
+==Other==
+BUTTON <--> A3
+BUZZER <--> A2
 
 COMPASS
 SCL <--> SCL (A5)
@@ -72,6 +76,10 @@ SDA <---> SDA (A4)
 #define LED_RED 13
 #define LED_BLUE 2
 
+#define BUZZER A2
+
+#define MODE_BUTTON A3
+
 //front failsafe distance
 #define MIN_FAILSAFE_DIST 5
 
@@ -83,46 +91,45 @@ Detection detection(TRIGGER_PIN_FORWARD, TRIGGER_PIN_ANGLED, TRIGGER_PIN_LEFT, E
 
 Command input;  //stores human inputs
 
+#define DEBUGGING
+
 void setup() {  
   
   Serial.begin(9600);
-  pinMode(13, OUTPUT);
+  pinMode(LED_RED, OUTPUT);
   Serial.print("Setup");
-  //Serial.println(Movement::Compass.GetHeadingDegrees());
 }
 
+// failSafeCheck() returns false if the wall in front of the robot is closer than MIN_FAILSAFE_DIST
 bool failSafeCheck() {
-  // if wall is too close return false      OLD---[and robot is being driven towards it, STOP (or reverse wheels depending on testing)]---
-  if (detection.getDistance(sensorID::Front) < MIN_FAILSAFE_DIST){
-    return false;
-    }
-    else return true;
+  if (detection.getDistance(sensorID::Front) < MIN_FAILSAFE_DIST) return false;
+  else return true;
   }
 
 void manual() {
-  //Serial.println("start manual");
-  while (!HuI.checkBT()) {} //wait for a command
+  
+  while (!HuI.checkBT()) {} //wait for the first command
 
   input = HuI.getInput(); //store input
   
   while (input != Command::Release) { //stay in manual mode until the Release command is recieved
     switch (input) {
         case Command::Forwards:
-            if (failSafeCheck()){
-              digitalWrite(13, LOW);
+            if (failSafeCheck()){   //no wall to close in front
+              digitalWrite(LED_RED, LOW);
               drive.drive(MAX_POWER);
             }
-            else {
-              digitalWrite(13, HIGH);
+            else {                  //failsafe prohibits forward motion
+              digitalWrite(LED_RED, HIGH);
               drive.stop_movement();
               delay(15);
             }
             break;
         case Command::Left:
-          drive.turn(true, -90);
+          drive.turn(true, -10);
           break;
         case Command::Right:
-          drive.turn(true, 90);
+          drive.turn(true, 10);
           break;
         default:
           drive.stop_movement();
@@ -144,23 +151,23 @@ void automatic() {
     int frontDistance = detection.getDistance(sensorID::Front);
     int angledDistance = detection.getDistance(sensorID::Angled);
     
-    if (leftDistance > DISTANCE_TO_WALL && leftDistance < DISTANCE_TO_WALL + 2) { // a little too far away
-      drive.turn(false, -(leftDistance - DISTANCE_TO_WALL) * 2);
+    if (leftDistance > DISTANCE_TO_WALL && leftDistance < DISTANCE_TO_WALL + 2) { // a little too far away from left wall
+      drive.turn(false, -(leftDistance - DISTANCE_TO_WALL) * 2);  //correct a little to the left
     }
     else if (leftDistance > DISTANCE_TO_WALL) { //no wall to the left
-      drive.turn(false, -45);
+      drive.turn(false, -45);                   //turn around the left corner 45 degrees
     }
       
     else if (leftDistance < DISTANCE_TO_WALL) { //too close to left wall
-      drive.turn(true, -(leftDistance - DISTANCE_TO_WALL) * 2);
+      drive.turn(false, -(leftDistance - DISTANCE_TO_WALL) * 2);   //correct a little to the right
     }
       
-    if (frontDistance < DISTANCE_TO_WALL || angledDistance < DISTANCE_TO_WALL) {
+    if (frontDistance < DISTANCE_TO_WALL || angledDistance < DISTANCE_TO_WALL) {    // come to a road block at the front, must turn right
       drive.stop_movement();
-      drive.turn(true, 45);
+      drive.turn(true, 45);   //turn on spot 45 degrees right
     }
   
-    drive.drive(MAX_POWER);
+    drive.drive(MAX_POWER);  //keep driving
 
   //check for new input
   if (HuI.checkBT()) {
@@ -170,6 +177,7 @@ void automatic() {
 }
 
 void loop() {
+  //robot starts in manual mode and waits for a command. Whenever it is told to leave a mode, it switches to the other one
   manual();
   automatic();
 }
