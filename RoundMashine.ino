@@ -9,6 +9,12 @@
  * block units
  * sonar smoothing/averaging
  * add overid button to switch to auto without BT
+ * Milliseconds between sensor pings (29ms is about the min to avoid cross-sensor echo).
+ * pullup resistors on I2C for compass?
+ * 
+ * void turn(intensity) should take a speed to turn at (implemented by ratio between wheel speeds) and be used for straight wall following. speed is determined by error between wanted value and measured value
+ * void turn(angle) should be called when a wall disappears on the side or appears in front
+ * 
  */
 
 /*
