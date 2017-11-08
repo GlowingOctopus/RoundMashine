@@ -5,7 +5,9 @@
 
 #include <SoftwareSerial.h>   //for BT comunication
 #include <NewPing.h>          //for ultrasonic sensors
+
 #include <cmath>
+
 
 #ifdef COMPASS
 #include <Wire.h>             //for I2C comunication with compass
@@ -15,6 +17,7 @@
 
 #define BLOCK_IN_CM 26  //size of a grid square in the maze
 #define MAX_POWER 180   //default 255
+
 #define COMPASS_TURN_P_CONSTANT 3	//proportional constant for turn() function
 
 #define DISTANCE_TO_WALL 2        //aim to keep this gap to the wall
@@ -22,7 +25,6 @@
 #define FORWARD_SENSOR_OFFSET 1   //distance between edge of chassis and sensor. default: 8
 #define LEFT_SENSOR_OFFSET  6     //distance between edge of chassis and sensor. default: 8
 #define ANGLED_SENSOR_OFFSET  0   //distance between edge of chassis and sensor. default: 8
-
 
 const double wheelDifRatio =  DISTANCE_TO_WALL / (DISTANCE_TO_WALL + CHASSIS_DIAMETER);
 
@@ -67,6 +69,8 @@ private:
   NewPing forwardSonar;
   NewPing angledSonar;
   NewPing leftSonar;
+  
+  int maxDist;
 
 public:
   int getDistance(sensorID ID);
