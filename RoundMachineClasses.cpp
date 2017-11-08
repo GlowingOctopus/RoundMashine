@@ -36,20 +36,29 @@ void Movement::turn(bool onSpot, int _degrees) {
 
 	if (_degrees != 0) {
 		#ifdef COMPASS
+		int target = (Compass.GetHeadingDegrees() + _degrees);
+		if (target < 0) target = 360 + target;
+		else target %= 360;
+		int error = (target - Compass.GetHeadingDegrees());
+
+		
+
+		if (onSpot) {
+			while ()
+		}
+
 		startOrientation = Compass.GetHeadingDegrees(); //find out the orientation before the turn starts
-   Serial.print("Start Orientation: ");
-   Serial.println(startOrientation);
-   Serial.print("_degrees: ");
-   Serial.println(_degrees);
 		if (onSpot) {
 			// if turn anticlockwise
 			if (_degrees < 0) {
-        //target orientation must be between 0 - 360
+        //target orientation must be between 0 - 360. make it between 0 and 360 if it's not
         if (startOrientation + _degrees < 0) {targetOrientation = startOrientation + _degrees + 360;} 
         else {targetOrientation = startOrientation + _degrees;}
         Serial.print("target orientation: ");
         Serial.println(targetOrientation);
+		
 				while (Compass.GetHeadingDegrees() > targetOrientation || (Compass.GetHeadingDegrees() > startOrientation + _degrees && Compass.GetHeadingDegrees() < startOrientation + 3)) { //turn until the target orientation is reached
+					
 					leftWheel(-MAX_POWER);
 					rightWheel(MAX_POWER);
           Serial.print("Current orientation: ");
