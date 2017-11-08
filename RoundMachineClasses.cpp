@@ -35,16 +35,15 @@ Movement::Movement(int L1, int L2, int R1, int R2) {
 void Movement::turn(bool onSpot, int _degrees) {
 
 	if (_degrees != 0) {
-		#ifdef COMPASS
+		/*#ifdef COMPASS
 		int target = (Compass.GetHeadingDegrees() + _degrees);
 		if (target < 0) target = 360 + target;
 		else target %= 360;
 		int error = (target - Compass.GetHeadingDegrees());
 
-		
+		*/
 
 		if (onSpot) {
-			while ()
 		}
 
 		startOrientation = Compass.GetHeadingDegrees(); //find out the orientation before the turn starts
