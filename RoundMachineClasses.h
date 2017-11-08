@@ -5,6 +5,7 @@
 
 #include <SoftwareSerial.h>   //for BT comunication
 #include <NewPing.h>          //for ultrasonic sensors
+#include <cmath>
 
 #ifdef COMPASS
 #include <Wire.h>             //for I2C comunication with compass
@@ -14,6 +15,7 @@
 
 #define BLOCK_IN_CM 26  //size of a grid square in the maze
 #define MAX_POWER 180   //default 255
+#define COMPASS_TURN_P_CONSTANT 3	//proportional constant for turn() function
 
 #define DISTANCE_TO_WALL 2        //aim to keep this gap to the wall
 #define CHASSIS_DIAMETER 10       //diameter of robot
