@@ -65,6 +65,7 @@ private:
   NewPing forwardSonar;
   NewPing angledSonar;
   NewPing leftSonar;
+  int maxDist;
 
 public:
   int getDistance(sensorID ID);

@@ -200,7 +200,7 @@ int Detection::getDistance(sensorID ID) {
 }
   //check if a new command is available over BT
 bool HumanInterface::checkBT() {
-	if (BTSerial.available() > 0 || MODE_BUTTON == HIGH) {
+	if (BTSerial.available() > 0 /*|| MODE_BUTTON == HIGH*/) {
 		return true;
 	}
 	else { 
