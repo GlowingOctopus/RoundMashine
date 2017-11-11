@@ -155,31 +155,32 @@ void manual() {
 
 
 void L90() {
-  drive
+  drive.turn(true, -90);
 
 }
 
 void R90() {
+  drive.turn(false, 90);
 
 }
 
 void L45() {
+  drive.turn(false, -45); 
 
 }
 
 void R45() {
+  drive.turn(false, 45);
 
 }
 
 void R135() {
+  drive.turn(false, 135);
 
 }
 
 void Uturn() {
-
-}
-
-void SlightFwd() {
+  drive.turn(true, 180);
 
 }
 
@@ -238,29 +239,47 @@ void automatic() {
 
       case Fwd:
         drive.drive(MAX_POWER);
-        
+        break;
 
       case SlightL:
         drive.drive(ADJUST_POWER, MAX_POWER);
+        break;
 
       case SlightR:
         drive.drive(MAX_POWER, ADJUST_POWER);
+        break;
 
       case L90:
+        L90();
+        break;
 
       case R90:
+        R90();
+        break;
 
       case L45:
-        // func left 45
+        L45();
+        int tempAngDist = detection.getDistance(sensorID::Angled);
+        if (tempAngDist == 20 || tempAngDist - 1 == 20 || tempAngDist + 1 == 20) {
+          R135();
+
+        }
+        break;
+
       case R45:
+        R45();
+        break;
 
       case R135:
+        R135();
+        break;
 
       case Uturn:
+        UTurn();
+        break;
 
       case SlightFwd:
-
-
+        SlightFwd();
 
 }
 
