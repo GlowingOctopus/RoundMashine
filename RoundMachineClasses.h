@@ -3,11 +3,10 @@
 
 #define COMPASS   // define if compass is being used to manage turning
 
+#define MODE_BUTTON A3
+
 #include <SoftwareSerial.h>   //for BT comunication
 #include <NewPing.h>          //for ultrasonic sensors
-
-#include <cmath>
-
 
 #ifdef COMPASS
 #include <Wire.h>             //for I2C comunication with compass
@@ -22,11 +21,11 @@
 
 #define DISTANCE_TO_WALL 2        //aim to keep this gap to the wall
 #define CHASSIS_DIAMETER 10       //diameter of robot
-#define FORWARD_SENSOR_OFFSET 1   //distance between edge of chassis and sensor. default: 8
-#define LEFT_SENSOR_OFFSET  6     //distance between edge of chassis and sensor. default: 8
-#define ANGLED_SENSOR_OFFSET  0   //distance between edge of chassis and sensor. default: 8
+#define FORWARD_SENSOR_OFFSET 8   //distance between edge of chassis and sensor. default: 8
+#define LEFT_SENSOR_OFFSET  8     //distance between edge of chassis and sensor. default: 8
+#define ANGLED_SENSOR_OFFSET  8   //distance between edge of chassis and sensor. default: 8
 
-const double wheelDifRatio =  DISTANCE_TO_WALL / (DISTANCE_TO_WALL + CHASSIS_DIAMETER);
+const double wheelDifRatio = DISTANCE_TO_WALL / (DISTANCE_TO_WALL + CHASSIS_DIAMETER);
 
 const int turnSpeed = 3; //the speed which the vehicle turns at in mS/degrees at full speed
 
@@ -35,59 +34,59 @@ enum class Command { Forwards, Backwards, Left, Right, Grab, Release, RLeft, RRi
 
 class Movement {
 private:
-  void leftWheel(int _speed);
-  void rightWheel(int _speed);
+	void leftWheel(int _speed);
+	void rightWheel(int _speed);
 
-  int leftMotor1;
-  int leftMotor2;
-  int rightMotor1;
-  int rightMotor2;
+	int leftMotor1;
+	int leftMotor2;
+	int rightMotor1;
+	int rightMotor2;
 
-  #ifdef COMPASS
-  HMC5883L_Simple Compass;
-  float startOrientation;
-  float targetOrientation;
+#ifdef COMPASS
+	HMC5883L_Simple Compass;
+	float startOrientation;
+	float targetOrientation;
 
-  //int getOrientation();
-  #endif //COMPASS
+	//int getOrientation();
+#endif //COMPASS
 
 public:
-  //functions to control movement
-  void turn(bool onSpot, int _degrees);
-  void stop_movement();
-  void drive(int _speed);
-  void drive(int leftSpeed, int rightSpeed);
+	//functions to control movement
+	void turn(bool onSpot, int _degrees);
+	void stop_movement();
+	void drive(int _speed);
+	void drive(int leftSpeed, int rightSpeed);
 
-  //Constructor
-  Movement(int L1, int L2, int R1, int R2);
+	//Constructor
+	Movement(int L1, int L2, int R1, int R2);
 
 
 };
 
 class Detection {
 private:
-  NewPing forwardSonar;
-  NewPing angledSonar;
-  NewPing leftSonar;
-  
-  int maxDist;
+	NewPing forwardSonar;
+	NewPing angledSonar;
+	NewPing leftSonar;
+
+	int maxDist;
 
 public:
-  int getDistance(sensorID ID);
-  Detection(int trigForward, int trigAngled, int trigLeft, int echoForward, int echoAngled, int echoLeft, int maxDist);
+	int getDistance(sensorID ID);
+	Detection(int trigForward, int trigAngled, int trigLeft, int echoForward, int echoAngled, int echoLeft, int maxDist);
 };
 
 class HumanInterface {
 private:
-  SoftwareSerial BTSerial;
+	//SoftwareSerial BTSerial;
 public:
-  // Checks whether there is any new input from a user
-  bool checkBT();
+	// Checks whether there is any new input from a user
+	bool checkBT();
 
-  Command getInput();
+	Command getInput();
 
-  //Constructor
-  HumanInterface(int rx, int tx);
+	//Constructor
+	HumanInterface(int rx, int tx);
 };
 
 #endif
