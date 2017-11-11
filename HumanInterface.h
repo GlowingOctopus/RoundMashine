@@ -1,6 +1,8 @@
 #ifndef HUMAN_INTERFACE_H
 #define HUMAN_INTERFACE_H
 
+#include "config.h"
+
 class HumanInterface {
 private:
 	//SoftwareSerial BTSerial;

@@ -1,6 +1,8 @@
 #ifndef MOVEMENT_H
 #define MOVEMENT_H
 
+#include "config.h"
+
 class Movement {
 private:
 	void leftWheel(int _speed);

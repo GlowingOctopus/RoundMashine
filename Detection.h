@@ -1,6 +1,8 @@
 #ifndef DETECTION_H
 #define DETECTION_H
 
+#include "config.h"
+
 class Detection {
 private:
 	NewPing forwardSonar;
