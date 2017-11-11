@@ -31,7 +31,7 @@ const int turnSpeed = 3; //the speed which the vehicle turns at in mS/degrees at
 
 enum class sensorID { Front, Left, Angled };  //e number to specify which ultrasonic sensor
 enum class Command { Forwards, Backwards, Left, Right, Grab, Release, RLeft, RRight, Stop };  //e number to store commands from user
-enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, SlightFwd }; //e number to define the current state of the robot
+enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, SlightFwd, DoNotChange }; //e number to define the current state of the robot
 
 class Movement {
 private:

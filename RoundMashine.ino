@@ -87,7 +87,7 @@
 
 //front failsafe distance
 #define MIN_FAILSAFE_DIST 5
-#define NO_FAILSAFE
+//#define NO_FAILSAFE
 
 #define DIST_THRESHHOLD 3
 
@@ -109,9 +109,6 @@ void setup() {
   Serial.println(detection.getDistance(sensorID::Angled));
   Serial.println(detection.getDistance(sensorID::Left)); */
 	pinMode(LED_RED, OUTPUT);
-
- 
-
 }
 
 // failSafeCheck() returns false if the wall in front of the robot is closer than MIN_FAILSAFE_DIST
@@ -214,12 +211,12 @@ State stateArray[2][2][2];
   // If the wall is too close, value = 1;
   //         F  D  L
   stateArray[0][0][0] = State::L45;
-  stateArray[0][0][1] = State::Fwd;
-  stateArray[0][1][0] = State::Fwd;
+  stateArray[0][0][1] = State::DoNotChange;
+  stateArray[0][1][0] = State::DoNotChange;
   stateArray[0][1][1] = State::L90;
   stateArray[1][0][0] = State::R45;
-  stateArray[1][0][1] = State::Fwd;
-  stateArray[1][1][0] = State::Fwd;
+  stateArray[1][0][1] = State::DoNotChange;
+  stateArray[1][1][0] = State::DoNotChange;
   stateArray[1][1][1] = State::R90;
 
 
@@ -256,7 +253,8 @@ State stateArray[2][2][2];
 
     // puts into a slight right or left turn state if in need of adjustment
     if (leftDistance < 2) currentState == State::SlightR;
-    else if (leftDistance > 2 && leftDistance < 4) currentState == State::SlightL;
+    else if (leftDistance > 2 && leftDistance < 6) currentState == State::SlightL;
+    else currentState == State::Fwd;
 
     // Sets distance of walls into a "too close" or "far away" in the form of 1 / 0
     if (leftDistance > 4) leftIndex = 0; else leftIndex = 1;
@@ -264,11 +262,12 @@ State stateArray[2][2][2];
     if (angledDistance > 4) angledIndex = 0; else angledIndex = 1;
 
     // looks up state on table
-    currentState = stateArray[frontIndex][angledIndex][leftIndex];
+
+    if (stateArray[frontIndex][angledIndex][leftIndex] != State::DoNotChange) currentState = stateArray[frontIndex][angledIndex][leftIndex];
 
 
     // Edge case - happens at the end for maximum override
-    if ((angledDistance == 20 || angledDistance + 1 == 20 || angledDistance - 1 == 20) && (frontDistance == 20 || frontDistance + 1 == 20 || frontDistance - 1 == 20)) {
+    if ((angledDistance == 12 || angledDistance + 1 == 12 || angledDistance - 1 == 12) && (frontDistance == 12 || frontDistance + 1 == 12 || frontDistance - 1 == 12)) {
        currentState = State::UTurn;
 
     }
@@ -365,6 +364,22 @@ State stateArray[2][2][2];
 
 void loop() {
 	//robot starts in manual mode and waits for a command. Whenever it is told to leave a mode, it switches to the other one
+  /*
+    delay(1000);
+    //take readings from sensors
+    int leftDistance = detection.getDistance(sensorID::Left);
+    Serial.print("Left Distance: ");
+    Serial.println(leftDistance);
+    delay(30); 
+    int frontDistance = detection.getDistance(sensorID::Front);
+    Serial.print("Front Distance: ");
+    Serial.println(frontDistance);
+    delay(30);
+    int angledDistance = detection.getDistance(sensorID::Angled);
+    Serial.print("Angled Distance: ");   
+    Serial.println(angledDistance);
+    delay(30);
+  */
 	manual();
 	automatic();
 
