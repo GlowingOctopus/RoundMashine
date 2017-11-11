@@ -6,6 +6,7 @@
 #include <SoftwareSerial.h>   //for BT comunication
 #include <NewPing.h>          //for ultrasonic sensors
 
+
 #ifdef COMPASS
 #include <Wire.h>             //for I2C comunication with compass
 #include <HMC5883L_Simple.h>  //for interfacing with compass
@@ -16,12 +17,13 @@
 #define MAX_POWER 180   //default 255
 #define ADJUST_POWER 120
 
+#define COMPASS_TURN_P_CONSTANT 3	//proportional constant for turn() function
+
 #define DISTANCE_TO_WALL 2        //aim to keep this gap to the wall
 #define CHASSIS_DIAMETER 10       //diameter of robot
-#define FORWARD_SENSOR_OFFSET 1   //distance between edge of chassis and sensor. default: 8
-#define LEFT_SENSOR_OFFSET  6     //distance between edge of chassis and sensor. default: 8
-#define ANGLED_SENSOR_OFFSET  0   //distance between edge of chassis and sensor. default: 8
-
+#define FORWARD_SENSOR_OFFSET 8   //distance between edge of chassis and sensor. default: 8
+#define LEFT_SENSOR_OFFSET  8     //distance between edge of chassis and sensor. default: 8
+#define ANGLED_SENSOR_OFFSET  8   //distance between edge of chassis and sensor. default: 8
 
 const double wheelDifRatio =  DISTANCE_TO_WALL / (DISTANCE_TO_WALL + CHASSIS_DIAMETER);
 
@@ -29,7 +31,7 @@ const int turnSpeed = 3; //the speed which the vehicle turns at in mS/degrees at
 
 enum class sensorID { Front, Left, Angled };  //e number to specify which ultrasonic sensor
 enum class Command { Forwards, Backwards, Left, Right, Grab, Release, RLeft, RRight };  //e number to store commands from user
-enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, SlightFwd }
+enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, SlightFwd } //e number to define the current state of the robot
 
 class Movement {
 private:
@@ -67,6 +69,8 @@ private:
   NewPing forwardSonar;
   NewPing angledSonar;
   NewPing leftSonar;
+  
+  int maxDist;
 
 public:
   int getDistance(sensorID ID);
@@ -87,4 +91,3 @@ public:
 };
 
 #endif
-

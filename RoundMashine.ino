@@ -62,10 +62,10 @@ SDA <---> SDA (A4)
 //HARDWARE CONNECTIONS//
 //--------------------//
 //motor connections must be pwm
-#define LEFT_MOTOR_1 3  
-#define LEFT_MOTOR_2 5
-#define RIGHT_MOTOR_1 6 
-#define RIGHT_MOTOR_2 9
+#define LEFT_MOTOR_1 6  
+#define LEFT_MOTOR_2 9
+#define RIGHT_MOTOR_1 5 
+#define RIGHT_MOTOR_2 3
 
 //ultrasonic connections and parameters
 #define TRIGGER_PIN_FORWARD 12
@@ -76,8 +76,8 @@ SDA <---> SDA (A4)
 #define ECHO_PIN_LEFT 8
 #define MAX_DISTANCE 200
 
-#define SORTWARE_SERIAL_RX 10
-#define SORTWARE_SERIAL_TX 11
+#define SORTWARE_SERIAL_RX 0
+#define SORTWARE_SERIAL_TX 1
 
 #define LED_RED 13
 #define LED_BLUE 2
@@ -322,4 +322,5 @@ void loop() {
   //robot starts in manual mode and waits for a command. Whenever it is told to leave a mode, it switches to the other one
   manual();
   automatic();
+
 }
