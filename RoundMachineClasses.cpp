@@ -217,6 +217,8 @@ Command HumanInterface::getInput() {
 	case 0x46: // F
 		input = Command::RRight;
 		break;
+  default:
+    input = Command::Stop;
 	}
 	return input;
 }
