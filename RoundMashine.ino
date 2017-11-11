@@ -91,6 +91,7 @@
 
 #define DIST_THRESHHOLD 3
 
+
 #include "RoundMachineClasses.h"
 
 HumanInterface HuI(SORTWARE_SERIAL_RX, SORTWARE_SERIAL_TX); //BT rx,tx
@@ -101,23 +102,16 @@ Command input;  //stores human inputs
 
 #define DEBUGGING
 
-<<<<<<< HEAD
 void setup() {
   Serial.begin(115200);
-  Serial.println("Connection Established."); 
+ /* Serial.println("Connection Established."); 
   Serial.println(detection.getDistance(sensorID::Front));
   Serial.println(detection.getDistance(sensorID::Angled));
-  Serial.println(detection.getDistance(sensorID::Left));
+  Serial.println(detection.getDistance(sensorID::Left)); */
 	pinMode(LED_RED, OUTPUT);
-=======
-using namespace State;
 
-void setup() {  
-  
-  Serial.begin(9600);
-  pinMode(LED_RED, OUTPUT);
-  Serial.print("Setup");
->>>>>>> 33d228e01c76c664f7760d7a860d3f43ffa338dd
+ 
+
 }
 
 // failSafeCheck() returns false if the wall in front of the robot is closer than MIN_FAILSAFE_DIST
@@ -135,6 +129,7 @@ void manual() {
 
 	while (input != Command::Release) { //stay in manual mode until the Release command is recieved
 		switch (input) {
+      
 		case Command::Forwards:
 			#ifndef NO_FAILSAFE 
 			if (failSafeCheck()) {   //no wall to close in front
@@ -148,16 +143,16 @@ void manual() {
 				delay(15);
 			}
      #endif
-     #ifdef NOFAILSAFE
-     Serial.println("drive!");
+     #ifdef NO_FAILSAFE
+    // Serial.println("drive!");
      drive.drive(MAX_POWER);
      #endif
 			break;
 		case Command::Left:
-			drive.turn(true, -10);
+			drive.turn(true, -90);
 			break;
 		case Command::Right:
-			drive.turn(true, 10);
+			drive.turn(true, 90);
 			break;
 		default:
 			drive.stop_movement();
@@ -197,7 +192,7 @@ void R135() {
 
 }
 
-void Uturn() {
+void UTurn() {
   drive.turn(true, 180);
 
 }
@@ -209,128 +204,127 @@ void Uturn() {
 
 
 void automatic() {
-<<<<<<< HEAD
-	//Serial.println("start auto");
+	Serial.println("start auto");
+
+ State currentState = State::Fwd;
+
+State stateArray[2][2][2];
+
+
+  // If the wall is too close, value = 1;
+  //         F  D  L
+  stateArray[0][0][0] = State::L45;
+  stateArray[0][0][1] = State::Fwd;
+  stateArray[0][1][0] = State::Fwd;
+  stateArray[0][1][1] = State::L90;
+  stateArray[1][0][0] = State::R45;
+  stateArray[1][0][1] = State::Fwd;
+  stateArray[1][1][0] = State::Fwd;
+  stateArray[1][1][1] = State::R90;
+
+
+
+  int leftIndex, frontIndex, angledIndex;
+
+
+ 
+ 
 	while (input != Command::Grab) {  //stay in auto mode until the Grab command is recieved
-
-	  //take readings from sensors
-		int leftDistance = detection.getDistance(sensorID::Left);
-		int frontDistance = detection.getDistance(sensorID::Front);
-		int angledDistance = detection.getDistance(sensorID::Angled);
-
-		if (leftDistance > DISTANCE_TO_WALL && leftDistance < DISTANCE_TO_WALL + 2) { // a little too far away from left wall
-			drive.turn(false, -(leftDistance - DISTANCE_TO_WALL) * 2);  //correct a little to the left
-		}
-		else if (leftDistance > DISTANCE_TO_WALL) { //no wall to the left
-			drive.turn(false, -45);                   //turn around the left corner 45 degrees
-		}
-
-		else if (leftDistance < DISTANCE_TO_WALL) { //too close to left wall
-			drive.turn(false, -(leftDistance - DISTANCE_TO_WALL) * 2);   //correct a little to the right
-		}
-
-		if (frontDistance < DISTANCE_TO_WALL || angledDistance < DISTANCE_TO_WALL) {    // come to a road block at the front, must turn right
-			drive.stop_movement();
-			drive.turn(true, 45);   //turn on spot 45 degrees right
-		}
-
-		drive.drive(MAX_POWER);  //keep driving
 
 	  //check for new input
 		if (HuI.checkBT()) {
 			input = HuI.getInput();
 		}
-	}
-=======
+	
 
-  State currentState = Fwd;
-
-  State stateArray[2][2][2];
-
-
-  //         F  D  L
-  stateArray[0][0][0] = R90;
-  stateArray[0][0][1] = Fwd;
-  stateArray[0][1][0] = Fwd;
-  stateArray[0][1][1] = L90;
-  stateArray[1][0][0] = R45;
-  stateArray[1][0][1] = Fwd;
-  stateArray[1][1][0] = Fwd;
-  stateArray[1][1][1] = L45;
-
-
-
-  int leftIndex, frontIndex, angledIndex;
-  //Serial.println("start auto");
-  while (input != Command::Grab) {  //stay in auto mode until the Grab command is recieved
-
+ 
+    delay(1000);
     //take readings from sensors
     int leftDistance = detection.getDistance(sensorID::Left);
+    Serial.print("Left Distance: ");
+    Serial.println(leftDistance);
     delay(30); 
     int frontDistance = detection.getDistance(sensorID::Front);
+    Serial.print("Front Distance: ");
+    Serial.println(frontDistance);
     delay(30);
     int angledDistance = detection.getDistance(sensorID::Angled);
+    Serial.print("Angled Distance: ");   
+    Serial.println(angledDistance);
     delay(30);
 
-    if (leftDistance < 2) currentState == SlightR;
-    else if (leftDistance > 2 && leftDistance < 4) currentState == SlightL;
 
+    // puts into a slight right or left turn state if in need of adjustment
+    if (leftDistance < 2) currentState == State::SlightR;
+    else if (leftDistance > 2 && leftDistance < 4) currentState == State::SlightL;
+
+    // Sets distance of walls into a "too close" or "far away" in the form of 1 / 0
     if (leftDistance > 4) leftIndex = 0; else leftIndex = 1;
     if (frontDistance > 4) frontIndex = 0; else frontIndex = 1;
     if (angledDistance > 4) angledIndex = 0; else angledIndex = 1;
 
+    // looks up state on table
     currentState = stateArray[frontIndex][angledIndex][leftIndex];
 
+
+    // Edge case - happens at the end for maximum override
     if ((angledDistance == 20 || angledDistance + 1 == 20 || angledDistance - 1 == 20) && (frontDistance == 20 || frontDistance + 1 == 20 || frontDistance - 1 == 20)) {
-       currentState = UTurn;
+       currentState = State::UTurn;
 
     }
 
     switch (currentState) {
 
-      case Fwd:
+      case State::Fwd:
         drive.drive(MAX_POWER);
+        Serial.println("FORWARD");
         break;
 
-      case SlightL:
+      case State::SlightL:
         drive.drive(ADJUST_POWER, MAX_POWER);
+        Serial.println("SLIGHT LEFT");
         break;
 
-      case SlightR:
+      case State::SlightR:
         drive.drive(MAX_POWER, ADJUST_POWER);
+        Serial.println("SLIGHT RIGHT");
         break;
 
-      case L90:
+      case State::L90:
+        Serial.println("LEFT 90");
         L90();
         break;
 
-      case R90:
+      case State::R90:
+        Serial.println("RIGHT 90");
         R90();
         break;
 
-      case L45:
+      case State::L45:
+        Serial.println("LEFT 45");
         L45();
-        int tempAngDist = detection.getDistance(sensorID::Angled);
+        int tempAngDist;
+        tempAngDist = detection.getDistance(sensorID::Angled);
         if (tempAngDist == 20 || tempAngDist - 1 == 20 || tempAngDist + 1 == 20) {
           R135();
 
         }
         break;
 
-      case R45:
+      case State::R45:
+        Serial.println("Right 45");
         R45();
         break;
 
-      case R135:
+      case State::R135:
+        Serial.println("RIGHT 135");
         R135();
         break;
 
-      case Uturn:
+      case State::UTurn:
+        Serial.println("UTURN");
         UTurn();
         break;
-
-      case SlightFwd:
-        SlightFwd();
 
 }
 
@@ -367,7 +361,6 @@ void automatic() {
     input = HuI.getInput();
   }*/
   }
->>>>>>> 33d228e01c76c664f7760d7a860d3f43ffa338dd
 }
 
 void loop() {

@@ -151,21 +151,24 @@ Detection::Detection(int trigForward, int trigAngled, int trigLeft, int echoForw
 //get the distance from a sensor
 int Detection::getDistance(sensorID ID) {
 	if (ID == sensorID::Front) {
-		int travelTime = forwardSonar.ping_median(1);   //smooth the results by taking a median
-		int dist = forwardSonar.convert_cm(travelTime) - FORWARD_SENSOR_OFFSET;   //subtract the offset
+		int travelTime = forwardSonar.ping_median(3);   //smooth the results by taking a median
+		int dist = forwardSonar.convert_cm(travelTime);
 		if (dist == 0) dist = maxDist;  //New ping returns 0 if distance is greater than maxDist. In this case, we want to retun maxDist
+    dist -= FORWARD_SENSOR_OFFSET;  //subtract the offset
 		return dist;
 	}
 	if (ID == sensorID::Left) {
 		int travelTime = leftSonar.ping_median(3);  //smooth the results by taking a median
-		int dist = leftSonar.convert_cm(travelTime) - LEFT_SENSOR_OFFSET; //subtract the offset
+		int dist = leftSonar.convert_cm(travelTime);
 		if (dist == 0) dist = maxDist;  //New ping returns 0 if distance is greater than maxDist. In this case, we want to retun maxDist
+    dist -= LEFT_SENSOR_OFFSET;  //subtract the offset
 		return dist;
 	}
 	if (ID == sensorID::Angled) {
 		int travelTime = angledSonar.ping_median(3);  //smooth the results by taking a median
-		int dist = angledSonar.convert_cm(travelTime) - ANGLED_SENSOR_OFFSET; //subtract the offset
+		int dist = angledSonar.convert_cm(travelTime);
 		if (dist == 0) dist = maxDist;  //New ping returns 0 if distance is greater than maxDist. In this case, we want to retun maxDist
+    dist -= ANGLED_SENSOR_OFFSET;  //subtract the offset
 		return dist;
 	}
 }
@@ -189,28 +192,29 @@ Command HumanInterface::getInput() {
 
 	Command input;
 	switch (key) {
-	case 0x38:
+	case 0x38: // 8
 		input = Command::Forwards;
+    Serial.println("unput = forwards");
 		break;
-	case 0x32:
+	case 0x32: // 2
 		input = Command::Backwards;
 		break;
-	case 0x34:
+	case 0x34:// 4
 		input = Command::Left;
 		break;
-	case 0x36:
+	case 0x36: // 6
 		input = Command::Right;
 		break;
-	case 0x44:
+	case 0x44: // D
 		input = Command::Release;
 		break;
-	case 0x43:
+	case 0x43: // C
 		input = Command::Grab;
 		break;
-	case 0x45:
+	case 0x45: // E
 		input = Command::RLeft;
 		break;
-	case 0x46:
+	case 0x46: // F
 		input = Command::RRight;
 		break;
 	}

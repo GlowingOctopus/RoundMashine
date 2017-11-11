@@ -14,7 +14,7 @@
 #endif // COMPASS
 
 #define BLOCK_IN_CM 26  //size of a grid square in the maze
-#define MAX_POWER 180   //default 255
+#define MAX_POWER 255   //default 255
 #define ADJUST_POWER 120
 
 #define COMPASS_TURN_P_CONSTANT 3	//proportional constant for turn() function
@@ -31,7 +31,7 @@ const int turnSpeed = 3; //the speed which the vehicle turns at in mS/degrees at
 
 enum class sensorID { Front, Left, Angled };  //e number to specify which ultrasonic sensor
 enum class Command { Forwards, Backwards, Left, Right, Grab, Release, RLeft, RRight };  //e number to store commands from user
-enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, SlightFwd } //e number to define the current state of the robot
+enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, SlightFwd }; //e number to define the current state of the robot
 
 class Movement {
 private:
@@ -74,9 +74,6 @@ public:
 	int getDistance(sensorID ID);
 	Detection(int trigForward, int trigAngled, int trigLeft, int echoForward, int echoAngled, int echoLeft, int maxDist);
 
-	NewPing forwardSonar;
-	NewPing angledSonar;
-	NewPing leftSonar;
 
 };
 
