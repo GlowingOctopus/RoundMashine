@@ -31,33 +31,40 @@ void Movement::turn(bool onSpot, int _degrees) {
 	if (_degrees != 0) {
 #ifdef COMPASS
 		int counter = 0;
-		int error;
-		int errorComplement;
-		int mSpeed;
+		int error, errorComplement, mSpeed;
 
 		int targetOrientation = (Compass.GetHeadingDegrees() + _degrees);
-		if (targetOrientation < 0) targetOrientation += 360;
-		else targetOrientation %= 360;
+
+		targetOrientation < 0 ? targetOrientation += 360 : targetOrientation %= 360;
 
 		while (counter <= 5) {
+
 			error = (targetOrientation - Compass.GetHeadingDegrees());
 			if (error < 0) errorComplement = error + 360;
 			else errorComplement = error - 360;
 			if (abs(errorComplement) < abs(error)) error = errorComplement;
+
+			Serial.print("Error: ");
+			Serial.println(error);
+
+			// error = smallest change in degrees to target
 
 			if (-20 < error <= 0) mSpeed = error * COMPASS_TURN_P_CONSTANT - (255 - 20 * COMPASS_TURN_P_CONSTANT);
 			else if (0 <= error < 20) mSpeed = error * COMPASS_TURN_P_CONSTANT + (255 - 20 * COMPASS_TURN_P_CONSTANT);
 			else if (error < 0) mSpeed = -255;
 			else mSpeed = 255;
 
+			Serial.print("Movement Speed: ");
+			Serial.println(mSpeed);
+			
+
 			if (-2 < error < 2) counter++;
 
 			if (onSpot) drive(mSpeed, -mSpeed);
 			else {	//turn on pivot
-				if (error < 0) {	//turning left
-					drive(abs(error) * wheelDifRatio, abs(error));
+				if (mSpeed < 0) {  drive(abs(mSpeed) * wheelDifRatio, abs(mSpeed)); //turning left
+				else drive(abs(mSpeed), abs(mSpeed) * wheelDifRatio);	//turning right
 				}
-				else drive(abs(error), abs(error) * wheelDifRatio);	//turning right
 			}
 		}
 #endif // COMPASS
