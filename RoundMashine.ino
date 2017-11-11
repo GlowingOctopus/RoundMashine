@@ -194,7 +194,19 @@ void UTurn() {
 
 }
 
+void slightLeft() {
+  drive.turn(true, -10);
+  drive.drive(MAX_POWER);
+  delay(100);
+  drive.turn(true, 10);  
+}
 
+void slightRight() {
+  drive.turn(true, 10);
+  drive.drive(MAX_POWER);
+  delay(100);
+  drive.turn(true, -10);  
+}
 
 
 
@@ -213,8 +225,8 @@ State stateArray[2][2][2];
   stateArray[0][0][0] = State::L45;
   stateArray[0][0][1] = State::DoNotChange;
   stateArray[0][1][0] = State::DoNotChange;
-  stateArray[0][1][1] = State::L90;
-  stateArray[1][0][0] = State::R45;
+  stateArray[0][1][1] = State::R45;
+  stateArray[1][0][0] = State::L90;
   stateArray[1][0][1] = State::DoNotChange;
   stateArray[1][1][0] = State::DoNotChange;
   stateArray[1][1][1] = State::R90;
@@ -235,7 +247,6 @@ State stateArray[2][2][2];
 	
 
  
-    delay(1000);
     //take readings from sensors
     int leftDistance = detection.getDistance(sensorID::Left);
     Serial.print("Left Distance: ");
@@ -252,12 +263,12 @@ State stateArray[2][2][2];
 
 
     // puts into a slight right or left turn state if in need of adjustment
-    if (leftDistance < 2) currentState == State::SlightR;
-    else if (leftDistance > 2 && leftDistance < 6) currentState == State::SlightL;
-    else currentState == State::Fwd;
+    if (leftDistance < 2) currentState = State::SlightR;
+    else if (leftDistance > 2 && leftDistance < 6) currentState = State::SlightL;
+    else currentState = State::Fwd;
 
     // Sets distance of walls into a "too close" or "far away" in the form of 1 / 0
-    if (leftDistance > 4) leftIndex = 0; else leftIndex = 1;
+    if (leftDistance > 5) leftIndex = 0; else leftIndex = 1;
     if (frontDistance > 4) frontIndex = 0; else frontIndex = 1;
     if (angledDistance > 4) angledIndex = 0; else angledIndex = 1;
 
@@ -280,13 +291,13 @@ State stateArray[2][2][2];
         break;
 
       case State::SlightL:
-        drive.drive(ADJUST_POWER, MAX_POWER);
         Serial.println("SLIGHT LEFT");
+        slightLeft();
         break;
 
       case State::SlightR:
-        drive.drive(MAX_POWER, ADJUST_POWER);
         Serial.println("SLIGHT RIGHT");
+        slightRight();
         break;
 
       case State::L90:

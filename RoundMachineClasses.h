@@ -15,7 +15,7 @@
 
 #define BLOCK_IN_CM 26  //size of a grid square in the maze
 #define MAX_POWER 255   //default 255
-#define ADJUST_POWER 120
+#define ADJUST_POWER 200
 
 #define COMPASS_TURN_P_CONSTANT 3	//proportional constant for turn() function
 
@@ -68,7 +68,10 @@ private:
 	NewPing angledSonar;
 	NewPing leftSonar;
 
+  int FwdPastDist[4], AngledPastDist[4], LeftPastDist[4];
 	int maxDist;
+
+  int getMedian(int pastVals[], int currentDist);
 
 public:
 	int getDistance(sensorID ID);
