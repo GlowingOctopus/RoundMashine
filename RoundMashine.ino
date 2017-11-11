@@ -89,6 +89,8 @@ SDA <---> SDA (A4)
 //front failsafe distance
 #define MIN_FAILSAFE_DIST 5
 
+#define DIST_THRESHHOLD 3
+
 #include "RoundMachineClasses.h"
 
 HumanInterface HuI(SORTWARE_SERIAL_RX, SORTWARE_SERIAL_TX); //BT rx,tx
@@ -98,6 +100,8 @@ Detection detection(TRIGGER_PIN_FORWARD, TRIGGER_PIN_ANGLED, TRIGGER_PIN_LEFT, E
 Command input;  //stores human inputs
 
 #define DEBUGGING
+
+using namespace State;
 
 void setup() {  
   
@@ -148,15 +152,128 @@ void manual() {
   }
 }
 
+
+
+void L90() {
+  drive
+
+}
+
+void R90() {
+
+}
+
+void L45() {
+
+}
+
+void R45() {
+
+}
+
+void R135() {
+
+}
+
+void Uturn() {
+
+}
+
+void SlightFwd() {
+
+}
+
+
+
+
+
+
+
 void automatic() {
+
+  State currentState = Fwd;
+
+  State stateArray[2][2][2];
+
+
+  //         F  D  L
+  stateArray[0][0][0] = R90;
+  stateArray[0][0][1] = Fwd;
+  stateArray[0][1][0] = Fwd;
+  stateArray[0][1][1] = L90;
+  stateArray[1][0][0] = R45;
+  stateArray[1][0][1] = Fwd;
+  stateArray[1][1][0] = Fwd;
+  stateArray[1][1][1] = L45;
+
+
+
+  int leftIndex, frontIndex, angledIndex;
   //Serial.println("start auto");
   while (input != Command::Grab) {  //stay in auto mode until the Grab command is recieved
 
     //take readings from sensors
-    int leftDistance = detection.getDistance(sensorID::Left); 
+    int leftDistance = detection.getDistance(sensorID::Left);
+    delay(30); 
     int frontDistance = detection.getDistance(sensorID::Front);
+    delay(30);
     int angledDistance = detection.getDistance(sensorID::Angled);
+    delay(30);
+
+    if (leftDistance < 2) currentState == SlightR;
+    else if (leftDistance > 2 && leftDistance < 4) currentState == SlightL;
+
+    if (leftDistance > 4) leftIndex = 0; else leftIndex = 1;
+    if (frontDistance > 4) frontIndex = 0; else frontIndex = 1;
+    if (angledDistance > 4) angledIndex = 0; else angledIndex = 1;
+
+    currentState = stateArray[frontIndex][angledIndex][leftIndex];
+
+    if ((angledDistance == 20 || angledDistance + 1 == 20 || angledDistance - 1 == 20) && (frontDistance == 20 || frontDistance + 1 == 20 || frontDistance - 1 == 20)) {
+       currentState = UTurn;
+
+    }
+
+    switch (currentState) {
+
+      case Fwd:
+        drive.drive(MAX_POWER);
+        
+
+      case SlightL:
+        drive.drive(ADJUST_POWER, MAX_POWER);
+
+      case SlightR:
+        drive.drive(MAX_POWER, ADJUST_POWER);
+
+      case L90:
+
+      case R90:
+
+      case L45:
+        // func left 45
+      case R45:
+
+      case R135:
+
+      case Uturn:
+
+      case SlightFwd:
+
+
+
+}
+
+
     
+    
+
+
+
+
+
+
+/*
     if (leftDistance > DISTANCE_TO_WALL && leftDistance < DISTANCE_TO_WALL + 2) { // a little too far away from left wall
       drive.turn(false, -(leftDistance - DISTANCE_TO_WALL) * 2);  //correct a little to the left
     }
@@ -178,7 +295,7 @@ void automatic() {
   //check for new input
   if (HuI.checkBT()) {
     input = HuI.getInput();
-  }
+  }*/
   }
 }
 

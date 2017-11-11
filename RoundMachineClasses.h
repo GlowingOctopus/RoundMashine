@@ -14,6 +14,7 @@
 
 #define BLOCK_IN_CM 26  //size of a grid square in the maze
 #define MAX_POWER 180   //default 255
+#define ADJUST_POWER 120
 
 #define DISTANCE_TO_WALL 2        //aim to keep this gap to the wall
 #define CHASSIS_DIAMETER 10       //diameter of robot
@@ -28,6 +29,7 @@ const int turnSpeed = 3; //the speed which the vehicle turns at in mS/degrees at
 
 enum class sensorID { Front, Left, Angled };  //e number to specify which ultrasonic sensor
 enum class Command { Forwards, Backwards, Left, Right, Grab, Release, RLeft, RRight };  //e number to store commands from user
+enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, SlightFwd }
 
 class Movement {
 private:
