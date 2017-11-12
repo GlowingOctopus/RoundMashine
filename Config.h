@@ -24,9 +24,8 @@
 
 #define DISTANCE_TO_WALL 2        //aim to keep this gap to the wall
 #define CHASSIS_DIAMETER 10       //diameter of robot
-#define FORWARD_SENSOR_OFFSET 8   //distance between edge of chassis and sensor. default: 8
-#define LEFT_SENSOR_OFFSET  8     //distance between edge of chassis and sensor. default: 8
-#define ANGLED_SENSOR_OFFSET  8   //distance between edge of chassis and sensor. default: 8
+#define SENSOR_OFFSET 8   //distance between edge of chassis and sensor
+
 
 const double wheelDifRatio = DISTANCE_TO_WALL / (DISTANCE_TO_WALL + CHASSIS_DIAMETER);
 

@@ -37,7 +37,7 @@ void setup() {
 	pinMode(LED_RED, OUTPUT);
 }
 
-// failSafeCheck() returns false if the wall in front of the robot is closer than MIN_FAILSAFE_DIST
+// failSafeCheck() returns false if the wall in front of the robot is closer than MIN_FAILSAFE_DIST   
 bool failSafeCheck() {
 	if (detection.getDistance(sensorID::Front) < MIN_FAILSAFE_DIST) return false;
 	else return true;
@@ -45,6 +45,8 @@ bool failSafeCheck() {
 
 void manual() {
   Serial.println("Manual");
+
+  detection.resetDistArray();
 
 	while (!HuI.checkBT()) {} //wait for the first command
   
@@ -123,15 +125,11 @@ void UTurn() {
 void slightLeft() {
   drive.turn(true, -10);
   drive.drive(MAX_POWER);
-  delay(100);
-  drive.turn(true, 10);  
 }
 
 void slightRight() {
   drive.turn(true, 10);
   drive.drive(MAX_POWER);
-  delay(100);
-  drive.turn(true, -10);  
 }
 
 
@@ -143,6 +141,8 @@ void automatic() {
 
  State currentState = State::Fwd;
 
+ detection.resetDistArray();
+
 State stateArray[2][2][2];
 
 
@@ -153,13 +153,14 @@ State stateArray[2][2][2];
   stateArray[0][1][0] = State::DoNotChange;
   stateArray[0][1][1] = State::R45;
   stateArray[1][0][0] = State::L90;
-  stateArray[1][0][1] = State::DoNotChange;
+  stateArray[1][0][1] = State::R90;
   stateArray[1][1][0] = State::DoNotChange;
   stateArray[1][1][1] = State::R90;
 
 
 
   int leftIndex, frontIndex, angledIndex;
+  bool slightLeftState, slightRightState;
 
 
  
@@ -200,14 +201,17 @@ State stateArray[2][2][2];
 
     // looks up state on table
 
-    if (stateArray[frontIndex][angledIndex][leftIndex] != State::DoNotChange) currentState = stateArray[frontIndex][angledIndex][leftIndex];
+    //if (stateArray[frontIndex][angledIndex][leftIndex] != State::DoNotChange) currentState = stateArray[frontIndex][angledIndex][leftIndex];
 
 
     // Edge case - happens at the end for maximum override
     if ((angledDistance == 12 || angledDistance + 1 == 12 || angledDistance - 1 == 12) && (frontDistance == 12 || frontDistance + 1 == 12 || frontDistance - 1 == 12)) {
-       currentState = State::UTurn;
+       currentState = State::R90;
 
     }
+
+    if (currentState != State::SlightL) slightLeftState = false;
+    if (currentState != State::SlightR) slightRightState = false;
 
     switch (currentState) {
 
@@ -217,32 +221,48 @@ State stateArray[2][2][2];
         break;
 
       case State::SlightL:
-        Serial.println("SLIGHT LEFT");
-        slightLeft();
+        if(!slightLeftState) {
+          slightLeft();
+          slightLeftState = true;
+          Serial.println("SLIGHT LEFT");
+        } else {
+          drive.drive(MAX_POWER);
+          Serial.println("FORWARD");    
+        }
         break;
 
       case State::SlightR:
-        Serial.println("SLIGHT RIGHT");
-        slightRight();
+        if(!slightRightState) {
+          slightRight();
+          slightRightState = true;
+          Serial.println("SLIGHT RIGHT");
+        } else {
+          drive.drive(MAX_POWER);
+          Serial.println("FORWARD");    
+        }
         break;
 
       case State::L90:
         Serial.println("LEFT 90");
         L90();
+        detection.resetDistArray();
         break;
 
       case State::R90:
         Serial.println("RIGHT 90");
+        detection.resetDistArray();
         R90();
         break;
 
       case State::L45:
         Serial.println("LEFT 45");
         L45();
+        detection.resetDistArray();
         int tempAngDist;
         tempAngDist = detection.getDistance(sensorID::Angled);
-        if (tempAngDist == 20 || tempAngDist - 1 == 20 || tempAngDist + 1 == 20) {
+        if (tempAngDist == 12 || tempAngDist - 1 == 12 || tempAngDist + 1 == 12) {
           R135();
+          detection.resetDistArray();
 
         }
         break;
@@ -250,16 +270,19 @@ State stateArray[2][2][2];
       case State::R45:
         Serial.println("Right 45");
         R45();
+        detection.resetDistArray();
         break;
 
       case State::R135:
         Serial.println("RIGHT 135");
         R135();
+        detection.resetDistArray();
         break;
 
       case State::UTurn:
         Serial.println("UTURN");
         UTurn();
+        detection.resetDistArray();
         break;
 
 }

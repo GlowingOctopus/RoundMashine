@@ -37,21 +37,21 @@ void Movement::turn(bool onSpot, int _degrees) {
 		int targetOrientation = (Compass.GetHeadingDegrees() + _degrees);
 
 		targetOrientation < 0 ? targetOrientation += 360 : targetOrientation %= 360;
-		Serial.print("Target: ");
-		Serial.println(targetOrientation);
+		//Serial.print("Target: ");
+		//Serial.println(targetOrientation);
 
 		while (counter <= 2) {
 
-			Serial.print("Facing: ");
-			Serial.println(Compass.GetHeadingDegrees());
+			//Serial.print("Facing: ");
+			//Serial.println(Compass.GetHeadingDegrees());
 
 			error = (targetOrientation - Compass.GetHeadingDegrees());
 			if (error < 0) errorComplement = error + 360;
 			else errorComplement = error - 360;
 			if (abs(errorComplement) < abs(error)) error = errorComplement;
 
-			Serial.print("Error: ");
-			Serial.println(error);
+			//Serial.print("Error: ");
+			//Serial.println(error);
 
 			// error = smallest change in degrees to target
 
@@ -60,8 +60,8 @@ void Movement::turn(bool onSpot, int _degrees) {
 			else if (error < 0) mSpeed = -255;
 			else mSpeed = 255;
 
-			Serial.print("Movement Speed: ");
-			Serial.println(mSpeed);
+			//Serial.print("Movement Speed: ");
+			//Serial.println(mSpeed);
 
 
 			if (-2 < error && error < 2) counter++;

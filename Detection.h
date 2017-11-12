@@ -13,10 +13,13 @@ private:
 	int maxDist;
 
 	int getMedian(int pastVals[], int currentDist);
+  int distanceConfig(int dist);
 
 public:
 	int getDistance(sensorID ID);
 	Detection(int trigForward, int trigAngled, int trigLeft, int echoForward, int echoAngled, int echoLeft, int maxDist);
+
+  void resetDistArray();
 
 
 };
