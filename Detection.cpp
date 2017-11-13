@@ -54,7 +54,7 @@ int Detection::getMedian(int pastVals[], int currentDist) {
   
   }
   Serial.println();
-	return tempArray[2];
+	return tempArray[1];
 }
 
 //get the distance from a sensor

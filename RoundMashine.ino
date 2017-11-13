@@ -190,25 +190,25 @@ State stateArray[2][2][2];
 
 
     // puts into a slight right or left turn state if in need of adjustment
-    if (leftDistance < 2) currentState = State::SlightR;
-    else if (leftDistance > 2 && leftDistance < 6) currentState = State::SlightL;
+    if (leftDistance < 3) currentState = State::SlightR;
+    else if (leftDistance > 3 && leftDistance < 6) currentState = State::SlightL;
     else currentState = State::Fwd;
 
     // Sets distance of walls into a "too close" or "far away" in the form of 1 / 0
     if (leftDistance > 5) leftIndex = 0; else leftIndex = 1;
-    if (frontDistance > 4) frontIndex = 0; else frontIndex = 1;
+    if (frontDistance > 12) frontIndex = 0; else frontIndex = 1;
     if (angledDistance > 4) angledIndex = 0; else angledIndex = 1;
 
     // looks up state on table
 
-    //if (stateArray[frontIndex][angledIndex][leftIndex] != State::DoNotChange) currentState = stateArray[frontIndex][angledIndex][leftIndex];
+    if (stateArray[frontIndex][angledIndex][leftIndex] != State::DoNotChange) currentState = stateArray[frontIndex][angledIndex][leftIndex];
 
 
     // Edge case - happens at the end for maximum override
-    if ((angledDistance == 12 || angledDistance + 1 == 12 || angledDistance - 1 == 12) && (frontDistance == 12 || frontDistance + 1 == 12 || frontDistance - 1 == 12)) {
-       currentState = State::R90;
+    //if ((angledDistance == 12 || angledDistance + 1 == 12 || angledDistance - 1 == 12) && (frontDistance == 12 || frontDistance + 1 == 12 || frontDistance - 1 == 12)) {
+    //       currentState = State::R90;
 
-    }
+    //}
 
     if (currentState != State::SlightL) slightLeftState = false;
     if (currentState != State::SlightR) slightRightState = false;
@@ -250,8 +250,8 @@ State stateArray[2][2][2];
 
       case State::R90:
         Serial.println("RIGHT 90");
-        detection.resetDistArray();
         R90();
+        detection.resetDistArray();
         break;
 
       case State::L45:
