@@ -79,6 +79,8 @@ void manual() {
 		case Command::Right:
 			drive.turn(true, 90);
 			break;
+    case Command::Backwards:
+      drive.drive(-MAX_POWER);
 		default:
 			drive.stop_movement();
 		}
@@ -122,29 +124,17 @@ void UTurn() {
 
 }
 
-void slightLeft() {
-  drive.turn(true, -10);
-  drive.drive(MAX_POWER);
-}
-
-void slightRight() {
-  drive.turn(true, 10);
-  drive.drive(MAX_POWER);
-}
-
-
-
-
-
 void automatic() {
+
+  delay(100);
+  
 	Serial.println("start auto");
 
- State currentState = State::Fwd;
+  State currentState = State::Fwd;
 
- detection.resetDistArray();
+  detection.resetDistArray();
 
-State stateArray[2][2][2];
-
+  State stateArray[2][2][2];
 
   // If the wall is too close, value = 1;
   //         F  D  L
@@ -160,10 +150,11 @@ State stateArray[2][2][2];
 
 
   int leftIndex, frontIndex, angledIndex;
-  bool slightLeftState, slightRightState;
 
+  float leftWheelPower = MAX_POWER;
 
- 
+  float error;
+
  
 	while (input != Command::Grab) {  //stay in auto mode until the Grab command is recieved
 
@@ -182,7 +173,7 @@ State stateArray[2][2][2];
     int frontDistance = detection.getDistance(sensorID::Front);
     Serial.print("Front Distance: ");
     Serial.println(frontDistance);
-    delay(30);
+    delay(100);
     int angledDistance = detection.getDistance(sensorID::Angled);
     Serial.print("Angled Distance: ");   
     Serial.println(angledDistance);
@@ -190,56 +181,57 @@ State stateArray[2][2][2];
 
 
     // puts into a slight right or left turn state if in need of adjustment
-    if (leftDistance < 3) currentState = State::SlightR;
-    else if (leftDistance > 3 && leftDistance < 6) currentState = State::SlightL;
+    if (leftDistance < MIN_DISTANCE_TO_WALL) currentState = State::SlightR;
+    else if (leftDistance > MAX_DISTANCE_TO_WALL) currentState = State::SlightL;
     else currentState = State::Fwd;
 
     // Sets distance of walls into a "too close" or "far away" in the form of 1 / 0
-    if (leftDistance > 5) leftIndex = 0; else leftIndex = 1;
-    if (frontDistance > 12) frontIndex = 0; else frontIndex = 1;
-    if (angledDistance > 4) angledIndex = 0; else angledIndex = 1;
+    leftDistance > LEFT_DIST_THRESHHOLD ? leftIndex = 0 : leftIndex = 1;
+    frontDistance > FRONT_DIST_THRESHHOLD ? frontIndex = 0 : frontIndex = 1;
+    angledDistance > ANGLED_DIST_THRESHHOLD ? angledIndex = 0 : angledIndex = 1;
 
     // looks up state on table
 
     if (stateArray[frontIndex][angledIndex][leftIndex] != State::DoNotChange) currentState = stateArray[frontIndex][angledIndex][leftIndex];
 
-
-    // Edge case - happens at the end for maximum override
-    //if ((angledDistance == 12 || angledDistance + 1 == 12 || angledDistance - 1 == 12) && (frontDistance == 12 || frontDistance + 1 == 12 || frontDistance - 1 == 12)) {
-    //       currentState = State::R90;
-
-    //}
-
-    if (currentState != State::SlightL) slightLeftState = false;
-    if (currentState != State::SlightR) slightRightState = false;
+    if (leftDistance > 60) currentState = State::BadValue;
 
     switch (currentState) {
 
       case State::Fwd:
-        drive.drive(MAX_POWER);
+        drive.drive(leftWheelPower, MAX_POWER);
         Serial.println("FORWARD");
         break;
 
       case State::SlightL:
-        if(!slightLeftState) {
-          slightLeft();
-          slightLeftState = true;
-          Serial.println("SLIGHT LEFT");
-        } else {
-          drive.drive(MAX_POWER);
-          Serial.println("FORWARD");    
-        }
+        
+          error = abs(leftDistance - MAX_DISTANCE_TO_WALL);
+          
+          leftWheelPower *= 1-(error/100);
+
+           if (leftWheelPower > 150) leftWheelPower = 150;
+
+        
+        Serial.println("SLIGHT LEFT");
+        Serial.println(leftWheelPower);
+ 
+        drive.drive(leftWheelPower, MAX_POWER);
         break;
 
       case State::SlightR:
-        if(!slightRightState) {
-          slightRight();
-          slightRightState = true;
-          Serial.println("SLIGHT RIGHT");
-        } else {
-          drive.drive(MAX_POWER);
-          Serial.println("FORWARD");    
-        }
+        
+        error = abs(leftDistance - MIN_DISTANCE_TO_WALL);
+         
+        leftWheelPower *= 1+(error/100);
+        
+        if (leftWheelPower < 150) leftWheelPower = 150;
+
+        if (leftWheelPower > 250) leftWheelPower = 250;
+       
+        Serial.println("SLIGHT RIGHT");
+        Serial.println(leftWheelPower);
+
+        drive.drive(leftWheelPower, MAX_POWER);
         break;
 
       case State::L90:
@@ -283,6 +275,21 @@ State stateArray[2][2][2];
         Serial.println("UTURN");
         UTurn();
         detection.resetDistArray();
+        break;
+
+     case State::BadValue:
+        Serial.println("BadValue");
+        drive.stop_movement();
+        Serial.print("Left Distance: ");
+        for (int i = 0; i < 10; i++) {
+        int leftDistance = detection.getDistance(sensorID::Left);
+        Serial.print(leftDistance);
+        Serial.print(", ");
+       delay(100); 
+
+        }
+        delay(99999999);  
+        
         break;
 
 }

@@ -14,6 +14,7 @@ private:
 
 	int getMedian(int pastVals[], int currentDist);
   int distanceConfig(int dist);
+  int ping_mm(sensorID theSensor);
 
 public:
 	int getDistance(sensorID ID);

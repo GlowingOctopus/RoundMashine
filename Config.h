@@ -17,23 +17,28 @@
 #endif // COMPASS
 
 #define BLOCK_IN_CM 26  //size of a grid square in the maze
-#define MAX_POWER 255   //default 255
+#define MAX_POWER 150   //default 255
 #define ADJUST_POWER 200
 
 #define COMPASS_TURN_P_CONSTANT 3	//proportional constant for turn() function
 
-#define DISTANCE_TO_WALL 2        //aim to keep this gap to the wall
-#define CHASSIS_DIAMETER 10       //diameter of robot
-#define SENSOR_OFFSET 8   //distance between edge of chassis and sensor
+#define MIN_DISTANCE_TO_WALL 20        //aim to keep this gap to the wall
+#define MAX_DISTANCE_TO_WALL 25        //aim to keep this gap to the wall
+#define CHASSIS_DIAMETER 100       //diameter of robot
+#define SENSOR_OFFSET 80   //distance between edge of chassis and sensor
+
+#define DIST_THRESHHOLD 30
+
+#define MICROSECONDS_PER_MM 5.7 // time in microseconds it takes sound to travel 1 mm
 
 
-const double wheelDifRatio = DISTANCE_TO_WALL / (DISTANCE_TO_WALL + CHASSIS_DIAMETER);
+const double wheelDifRatio = DIST_THRESHHOLD / (DIST_THRESHHOLD + CHASSIS_DIAMETER);
 
 const int turnSpeed = 3; //the speed which the vehicle turns at in mS/degrees at full speed
 
 enum class sensorID { Front, Left, Angled };  //e number to specify which ultrasonic sensor
 enum class Command { Forwards, Backwards, Left, Right, Grab, Release, RLeft, RRight, Stop };  //e number to store commands from user
-enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, SlightFwd, DoNotChange }; //e number to define the current state of the robot
+enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, SlightFwd, DoNotChange, BadValue}; //e number to define the current state of the robot
 
 /*
  ===Bluetooth===
@@ -82,8 +87,8 @@ enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, Sligh
  //motor connections must be pwm
 #define LEFT_MOTOR_1 6  
 #define LEFT_MOTOR_2 9
-#define RIGHT_MOTOR_1 5 
-#define RIGHT_MOTOR_2 3
+#define RIGHT_MOTOR_1 3 
+#define RIGHT_MOTOR_2 5
 
 //ultrasonic connections and parameters
 #define TRIGGER_PIN_FORWARD 12
@@ -92,7 +97,7 @@ enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, Sligh
 #define ECHO_PIN_FORWARD 7
 #define ECHO_PIN_ANGLED 4
 #define ECHO_PIN_LEFT 8
-#define MAX_DISTANCE 200
+#define MAX_DISTANCE 2000
 
 #define SORTWARE_SERIAL_RX 0
 #define SORTWARE_SERIAL_TX 1
@@ -104,9 +109,11 @@ enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, Sligh
 
 
 //front failsafe distance
-#define MIN_FAILSAFE_DIST 5
+#define MIN_FAILSAFE_DIST 50
 //#define NO_FAILSAFE
 
-#define DIST_THRESHHOLD 3
+#define LEFT_DIST_THRESHHOLD 50
+#define FRONT_DIST_THRESHHOLD 30
+#define ANGLED_DIST_THRESHHOLD 1
 
 #endif
