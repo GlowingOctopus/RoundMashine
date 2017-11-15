@@ -46,7 +46,7 @@ bool failSafeCheck() {
 void manual() {
   Serial.println("Manual");
 
-  detection.resetDistArray();
+  detection.resetDistArray(); //resets the array of previous distance readings
 
 	while (!HuI.checkBT()) {} //wait for the first command
   
@@ -74,11 +74,15 @@ void manual() {
      #endif
 			break;
 		case Command::Left:
-			drive.turn(true, -90);
+			drive.turn(true, -45);
+			input = Command::Stop;
 			break;
 		case Command::Right:
-			drive.turn(true, 90);
+			drive.turn(true, 45);
+			input = Command::Stop;
 			break;
+		case Command::Backwards:
+			drive.drive(-MAX_POWER);
 		default:
 			drive.stop_movement();
 		}

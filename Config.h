@@ -2,7 +2,8 @@
 #define CONFIG_H
 //Definitions of configurable variables and states
 
-#define DEBUGGING
+//#define DEBUGGING
+#define NEW_INTERFACE
 
 #define COMPASS   // define if compass is being used to manage turning
 

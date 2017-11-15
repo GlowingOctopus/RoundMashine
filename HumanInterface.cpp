@@ -21,29 +21,29 @@ Command HumanInterface::getInput() {
 
 	Command input;
 	switch (key) {
-	case 0x38: // 8
+	case 'w': // old: 8
 		input = Command::Forwards;
 		Serial.println("unput = forwards");
 		break;
-	case 0x32: // 2
+	case 's': // old: 2
 		input = Command::Backwards;
 		break;
-	case 0x34:// 4
+	case 'a':// old: 4
 		input = Command::Left;
 		break;
-	case 0x36: // 6
+	case 'd': // old: 6
 		input = Command::Right;
 		break;
-	case 0x44: // D
+	case 'r': // old: D
 		input = Command::Release;
 		break;
-	case 0x43: // C
+	case 'g': // old: C
 		input = Command::Grab;
 		break;
-	case 0x45: // E
+	case 0x45: // old: E
 		input = Command::RLeft;
 		break;
-	case 0x46: // F
+	case 0x46: // old: F
 		input = Command::RRight;
 		break;
 	default:
