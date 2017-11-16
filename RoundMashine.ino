@@ -134,6 +134,8 @@ void automatic() {
 
   detection.resetDistArray();
 
+  float tempPower;
+
   State stateArray[2][2][2];
 
   // If the wall is too close, value = 1;
@@ -150,11 +152,8 @@ void automatic() {
 
 
   int leftIndex, frontIndex, angledIndex;
-
-  float leftWheelPower = MAX_POWER;
-
+  
   float error;
-
  
 	while (input != Command::Grab) {  //stay in auto mode until the Grab command is recieved
 
@@ -199,39 +198,28 @@ void automatic() {
     switch (currentState) {
 
       case State::Fwd:
-        drive.drive(leftWheelPower, MAX_POWER);
+        drive.drive(AUTO_POWER);
         Serial.println("FORWARD");
         break;
 
       case State::SlightL:
         
-          error = abs(leftDistance - MAX_DISTANCE_TO_WALL);
-          
-          leftWheelPower *= 1-(error/100);
-
-           if (leftWheelPower > 150) leftWheelPower = 150;
-
+        error = abs(leftDistance - MAX_DISTANCE_TO_WALL);
+        tempPower = AUTO_POWER * (1-(error*4/100));
+        drive.drive(tempPower, AUTO_POWER);
         
         Serial.println("SLIGHT LEFT");
-        Serial.println(leftWheelPower);
- 
-        drive.drive(leftWheelPower, MAX_POWER);
+        Serial.println(error);
         break;
 
       case State::SlightR:
         
         error = abs(leftDistance - MIN_DISTANCE_TO_WALL);
-         
-        leftWheelPower *= 1+(error/100);
+        tempPower = AUTO_POWER * (1-(error*4/100));
+        drive.drive(AUTO_POWER, tempPower);
         
-        if (leftWheelPower < 150) leftWheelPower = 150;
-
-        if (leftWheelPower > 250) leftWheelPower = 250;
-       
         Serial.println("SLIGHT RIGHT");
-        Serial.println(leftWheelPower);
-
-        drive.drive(leftWheelPower, MAX_POWER);
+        Serial.println(error);
         break;
 
       case State::L90:
@@ -288,44 +276,11 @@ void automatic() {
        delay(100); 
 
         }
-        delay(99999999);  
+        delay(20000);  
         
         break;
 
-}
-
-
-    
-    
-
-
-
-
-
-
-/*
-    if (leftDistance > DISTANCE_TO_WALL && leftDistance < DISTANCE_TO_WALL + 2) { // a little too far away from left wall
-      drive.turn(false, -(leftDistance - DISTANCE_TO_WALL) * 2);  //correct a little to the left
     }
-    else if (leftDistance > DISTANCE_TO_WALL) { //no wall to the left
-      drive.turn(false, -45);                   //turn around the left corner 45 degrees
-    }
-      
-    else if (leftDistance < DISTANCE_TO_WALL) { //too close to left wall
-      drive.turn(false, -(leftDistance - DISTANCE_TO_WALL) * 2);   //correct a little to the right
-    }
-      
-    if (frontDistance < DISTANCE_TO_WALL || angledDistance < DISTANCE_TO_WALL) {    // come to a road block at the front, must turn right
-      drive.stop_movement();
-      drive.turn(true, 45);   //turn on spot 45 degrees right
-    }
-  
-    drive.drive(MAX_POWER);  //keep driving
-
-  //check for new input
-  if (HuI.checkBT()) {
-    input = HuI.getInput();
-  }*/
   }
 }
 

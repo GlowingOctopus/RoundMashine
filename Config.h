@@ -17,13 +17,13 @@
 #endif // COMPASS
 
 #define BLOCK_IN_CM 26  //size of a grid square in the maze
-#define MAX_POWER 150   //default 255
-#define ADJUST_POWER 200
+#define MAX_POWER 255   //default 255
+#define AUTO_POWER 200
 
 #define COMPASS_TURN_P_CONSTANT 3	//proportional constant for turn() function
 
 #define MIN_DISTANCE_TO_WALL 20        //aim to keep this gap to the wall
-#define MAX_DISTANCE_TO_WALL 25        //aim to keep this gap to the wall
+#define MAX_DISTANCE_TO_WALL 20        //aim to keep this gap to the wall
 #define CHASSIS_DIAMETER 100       //diameter of robot
 #define SENSOR_OFFSET 80   //distance between edge of chassis and sensor
 
