@@ -210,6 +210,7 @@ void automatic() {
         
         Serial.println("SLIGHT LEFT");
         Serial.println(error);
+        Serial.println(tempPower);
         break;
 
       case State::SlightR:
@@ -220,6 +221,7 @@ void automatic() {
         
         Serial.println("SLIGHT RIGHT");
         Serial.println(error);
+        Serial.println(tempPower);
         break;
 
       case State::L90:
