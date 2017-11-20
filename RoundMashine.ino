@@ -28,6 +28,8 @@ Detection detection(TRIGGER_PIN_FORWARD, TRIGGER_PIN_ANGLED, TRIGGER_PIN_LEFT, E
 
 Command input;  //stores human inputs
 
+Command prevInput;
+
 void setup() {
   Serial.begin(115200);
  /* Serial.println("Connection Established."); 
@@ -43,8 +45,23 @@ bool failSafeCheck() {
 	else return true;
 }
 
+
+
+  int leftWheelPower = MAX_POWER;
+  int rightWheelPower = MAX_POWER;
+
+  
+void changeTrim(bool left) {
+  if (left) {
+    rightWheelPower < 255 ? rightWheelPower++ : leftWheelPower--;
+    }
+  else
+    leftWheelPower < 255 ? leftWheelPower++ : rightWheelPower--;
+  }
+
 void manual() {
   Serial.println("Manual");
+
 
   detection.resetDistArray(); //resets the array of previous distance readings
 
@@ -52,14 +69,18 @@ void manual() {
   
 	input = HuI.getInput(); //store input
 
+  bool forwards = true;
+ 
+
 	while (input != Command::Release) { //stay in manual mode until the Release command is recieved
 		switch (input) {
       
 		case Command::Forwards:
+      forwards = true;
 			#ifndef NO_FAILSAFE 
 			if (failSafeCheck()) {   //no wall to close in front
 				digitalWrite(LED_RED, LOW);
-				drive.drive(MAX_POWER);
+				drive.drive(leftWheelPower, rightWheelPower);
 			}
           
 			else {                  //failsafe prohibits forward motion
@@ -68,34 +89,63 @@ void manual() {
 				delay(15);
 			}
      #endif
+     
      #ifdef NO_FAILSAFE
-    // Serial.println("drive!");
-     drive.drive(MAX_POWER);
+     drive.drive(leftWheelPower, rightWheelPower);
      #endif
-			break;
+		 break;
+      
 		case Command::Left:
-			drive.turn(true, -45);
-			input = Command::Stop;
+      if (forwards) { drive.drive(0, rightWheelPower); } 
+      else { drive.drive(0, -rightWheelPower); }
 			break;
+      
 		case Command::Right:
-			drive.turn(true, 45);
-			input = Command::Stop;
+      if (forwards) { drive.drive(leftWheelPower, 0); } 
+      else { drive.drive(-leftWheelPower, 0); }
 			break;
-<<<<<<< HEAD
+      
 		case Command::Backwards:
-			drive.drive(-MAX_POWER);
-=======
-    case Command::Backwards:
-      drive.drive(-MAX_POWER);
->>>>>>> Wall-Following-Reconstruction
+      forwards = false;
+			drive.drive(-leftWheelPower, -rightWheelPower);
+     break;
+
+    case Command::Right45:
+      drive.turn(true, 45);
+      drive.drive(0, 0);
+      break;
+      
+    case Command::Left45:
+      drive.turn(true, -45);
+      drive.drive(0, 0);
+      break;
+      
+    case Command::TrimLeft:
+      changeTrim(true);
+      break;
+      
+    case Command::TrimRight:
+      changeTrim(false);
+      break;
+      
 		default:
 			drive.stop_movement();
 		}
 
+
+    if (input != Command::TrimLeft && input != Command::TrimRight) {
 		//check for new input
-		if (HuI.checkBT()) {
-			input = HuI.getInput();
-		}
+		while (!HuI.checkBT()) { }
+    prevInput = input;
+    input = HuI.getInput(); 
+
+    } else  {
+
+    if (HuI.checkBT()) {
+       input = HuI.getInput();        
+      } else { input = prevInput; }
+      
+    }
 	}
 }
 
@@ -107,22 +157,22 @@ void L90() {
 }
 
 void R90() {
-  drive.turn(false, 90);
+  drive.turn(true, 90);
 
 }
 
 void L45() {
-  drive.turn(false, -45); 
+  drive.turn(true, -45); 
 
 }
 
 void R45() {
-  drive.turn(false, 45);
+  drive.turn(true, 45);
 
 }
 
 void R135() {
-  drive.turn(false, 135);
+  drive.turn(true, 135);
 
 }
 
@@ -130,6 +180,29 @@ void UTurn() {
   drive.turn(true, 180);
 
 }
+
+bool goToTurn() {
+
+    for (int i = 0; i < 20; i++) {
+
+    int leftDistance = detection.getDistance(sensorID::Left);
+    Serial.print("Left Distance: ");
+    Serial.println(leftDistance);
+    delay(30); 
+    int frontDistance = detection.getDistance(sensorID::Front);
+    Serial.print("Front Distance: ");
+    Serial.println(frontDistance);
+    delay(30);
+
+    if (leftDistance < 50) { return false; }
+    if (frontDistance < 20) { return true; }
+    if (i == 19) { Serial.println("DONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONE"); return true; }
+
+    }
+}
+
+
+
 
 void automatic() {
 
@@ -140,8 +213,6 @@ void automatic() {
   State currentState = State::Fwd;
 
   detection.resetDistArray();
-
-  float tempPower;
 
   State stateArray[2][2][2];
 
@@ -160,7 +231,7 @@ void automatic() {
 
   int leftIndex, frontIndex, angledIndex;
   
-  float error;
+  float error, tempPower;
  
 	while (input != Command::Grab) {  //stay in auto mode until the Grab command is recieved
 
@@ -179,7 +250,7 @@ void automatic() {
     int frontDistance = detection.getDistance(sensorID::Front);
     Serial.print("Front Distance: ");
     Serial.println(frontDistance);
-    delay(100);
+    delay(30);
     int angledDistance = detection.getDistance(sensorID::Angled);
     Serial.print("Angled Distance: ");   
     Serial.println(angledDistance);
@@ -200,7 +271,7 @@ void automatic() {
 
     if (stateArray[frontIndex][angledIndex][leftIndex] != State::DoNotChange) currentState = stateArray[frontIndex][angledIndex][leftIndex];
 
-    if (leftDistance > 60) currentState = State::BadValue;
+   // if (leftDistance > 60) currentState = State::BadValue;
 
     switch (currentState) {
 
@@ -233,23 +304,25 @@ void automatic() {
 
       case State::L90:
         Serial.println("LEFT 90");
-        L90();
+        if (goToTurn()) { L90(); }
         detection.resetDistArray();
         break;
 
       case State::R90:
         Serial.println("RIGHT 90");
+        goToTurn();
         R90();
         detection.resetDistArray();
         break;
 
       case State::L45:
         Serial.println("LEFT 45");
-        L45();
+        if (goToTurn()) { L45(); }
         detection.resetDistArray();
         int tempAngDist;
         tempAngDist = detection.getDistance(sensorID::Angled);
         if (tempAngDist == 12 || tempAngDist - 1 == 12 || tempAngDist + 1 == 12) {
+          goToTurn();
           R135();
           detection.resetDistArray();
 
@@ -258,12 +331,14 @@ void automatic() {
 
       case State::R45:
         Serial.println("Right 45");
+        goToTurn();
         R45();
         detection.resetDistArray();
         break;
 
       case State::R135:
         Serial.println("RIGHT 135");
+        goToTurn();
         R135();
         detection.resetDistArray();
         break;

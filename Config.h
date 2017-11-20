@@ -23,8 +23,8 @@
 
 #define COMPASS_TURN_P_CONSTANT 3	//proportional constant for turn() function
 
-#define MIN_DISTANCE_TO_WALL 20        //aim to keep this gap to the wall
-#define MAX_DISTANCE_TO_WALL 20        //aim to keep this gap to the wall
+#define MIN_DISTANCE_TO_WALL 30        //aim to keep this gap to the wall
+#define MAX_DISTANCE_TO_WALL 30        //aim to keep this gap to the wall
 #define CHASSIS_DIAMETER 100       //diameter of robot
 #define SENSOR_OFFSET 80   //distance between edge of chassis and sensor
 
@@ -38,8 +38,8 @@ const double wheelDifRatio = DIST_THRESHHOLD / (DIST_THRESHHOLD + CHASSIS_DIAMET
 const int turnSpeed = 3; //the speed which the vehicle turns at in mS/degrees at full speed
 
 enum class sensorID { Front, Left, Angled };  //e number to specify which ultrasonic sensor
-enum class Command { Forwards, Backwards, Left, Right, Grab, Release, RLeft, RRight, Stop };  //e number to store commands from user
-enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, SlightFwd, DoNotChange, BadValue}; //e number to define the current state of the robot
+enum class Command { Forwards, Backwards, Left, Right, Grab, Release, Left45, Right45, TrimLeft, TrimRight, Stop };  //e number to store commands from user
+enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, SlightFwd, DoNotChange, BadValue }; //e number to define the current state of the robot
 
 /*
  ===Bluetooth===
