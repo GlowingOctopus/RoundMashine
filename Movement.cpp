@@ -55,8 +55,8 @@ void Movement::turn(bool onSpot, int _degrees) {
 
 			// error = smallest change in degrees to target
 
-			if (-20 < error && error <= 0) mSpeed = -40/*error * COMPASS_TURN_P_CONSTANT - (255 - 20 * COMPASS_TURN_P_CONSTANT)*/;
-			else if (0 <= error && error < 20) mSpeed = 40/*error * COMPASS_TURN_P_CONSTANT + (255 - 20 * COMPASS_TURN_P_CONSTANT)*/;
+			if (-20 < error && error <= 0) mSpeed = error * COMPASS_TURN_P_CONSTANT - (255 - 20 * COMPASS_TURN_P_CONSTANT);
+			else if (0 <= error && error < 20) mSpeed = error * COMPASS_TURN_P_CONSTANT + (255 - 20 * COMPASS_TURN_P_CONSTANT);
 			else if (error < 0) mSpeed = -255;
 			else mSpeed = 255;
 

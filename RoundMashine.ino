@@ -45,8 +45,6 @@ bool failSafeCheck() {
 	else return true;
 }
 
-
-
   int leftWheelPower = MAX_POWER;
   int rightWheelPower = MAX_POWER;
 
