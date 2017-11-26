@@ -82,6 +82,7 @@ enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, Sligh
 
 */
 
+<<<<<<< HEAD
  //HARDWARE CONNECTIONS//
  //--------------------//
  //motor connections must be pwm
@@ -89,6 +90,15 @@ enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, Sligh
 #define LEFT_MOTOR_2 3 //9
 #define RIGHT_MOTOR_1 6 // 3 
 #define RIGHT_MOTOR_2 9 // 5
+=======
+//HARDWARE CONNECTIONS//
+//--------------------//
+//motor connections must be pwm
+#define LEFT_MOTOR_1 6  
+#define LEFT_MOTOR_2 9
+#define RIGHT_MOTOR_1 3 
+#define RIGHT_MOTOR_2 5
+>>>>>>> 8910425768294832145ca1aecbbc5364c3608313
 
 //ultrasonic connections and parameters
 #define TRIGGER_PIN_FORWARD 12
