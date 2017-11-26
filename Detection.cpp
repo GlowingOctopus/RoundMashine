@@ -100,9 +100,13 @@ int Detection::getMedian(int pastVals[], int currentDist) {
 		}
 	}
 
- for (int i = 0; i < 4; i++) {
-  Serial.print(pastVals[i]);
-  
+	/*   Serial.print("Past array: ");
+	 for (int i = 0; i < 4; i++) {
+	  Serial.print(pastVals[i]);
+	  Serial.print(", ");
+
+	  }
+	  Serial.println(); */
 	return tempArray[2];
 }
 
@@ -111,6 +115,12 @@ int Detection::getDistance(sensorID ID) {
 	if (ID == sensorID::Front) {
 		int newDist = distanceConfig(ping_mm(sensorID::Front));
 		int dist = getMedian(FwdPastDist, newDist);
+
+		// update array with new val, delete oldest val
+		FwdPastDist[3] = FwdPastDist[2];
+		FwdPastDist[2] = FwdPastDist[1];
+		FwdPastDist[1] = FwdPastDist[0];
+		FwdPastDist[0] = newDist;
 
 
 		return dist;
