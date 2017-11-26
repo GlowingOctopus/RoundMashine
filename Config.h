@@ -23,8 +23,7 @@
 
 #define COMPASS_TURN_P_CONSTANT 3	//proportional constant for turn() function
 
-#define MIN_DISTANCE_TO_WALL 30        //aim to keep this gap to the wall
-#define MAX_DISTANCE_TO_WALL 30        //aim to keep this gap to the wall
+#define DISTANCE_TO_WALL 30        //aim to keep this gap to the wall
 #define CHASSIS_DIAMETER 100       //diameter of robot
 #define SENSOR_OFFSET 80   //distance between edge of chassis and sensor
 
@@ -86,10 +85,10 @@ enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, Sligh
  //HARDWARE CONNECTIONS//
  //--------------------//
  //motor connections must be pwm
-#define LEFT_MOTOR_1 6  
-#define LEFT_MOTOR_2 9
-#define RIGHT_MOTOR_1 3 
-#define RIGHT_MOTOR_2 5
+#define LEFT_MOTOR_1 5 // 6  
+#define LEFT_MOTOR_2 3 //9
+#define RIGHT_MOTOR_1 6 // 3 
+#define RIGHT_MOTOR_2 9 // 5
 
 //ultrasonic connections and parameters
 #define TRIGGER_PIN_FORWARD 12
@@ -114,7 +113,7 @@ enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, Sligh
 //#define NO_FAILSAFE
 
 #define LEFT_DIST_THRESHHOLD 50
-#define FRONT_DIST_THRESHHOLD 30
-#define ANGLED_DIST_THRESHHOLD 1
+#define FRONT_DIST_THRESHHOLD 60
+#define ANGLED_DIST_THRESHHOLD 30
 
 #endif

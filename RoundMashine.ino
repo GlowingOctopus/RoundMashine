@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////
+ ///////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////
 ///////////////////// WELCOME TO ROUNDMASHINE /////////////////////
 ///////////////////// ----- Pat and Zac ----- /////////////////////
@@ -41,7 +41,9 @@ void setup() {
 
 // failSafeCheck() returns false if the wall in front of the robot is closer than MIN_FAILSAFE_DIST   
 bool failSafeCheck() {
-	if (detection.getDistance(sensorID::Front) < MIN_FAILSAFE_DIST) return false;
+  int distance = detection.getDistance(sensorID::Front);
+  Serial.println(distance);
+	if ( distance < MIN_FAILSAFE_DIST) return false;
 	else return true;
 }
 
@@ -134,8 +136,19 @@ void manual() {
 
 
     if (input != Command::TrimLeft && input != Command::TrimRight) {
+
+    
 		//check for new input
-		while (!HuI.checkBT()) { }
+		while (!HuI.checkBT()) { 
+		  if (input == Command::Forwards) {
+
+        if (!failSafeCheck()) {
+        drive.stop_movement();
+        delay(15);
+        }
+		  }
+		  
+		  }
     prevInput = input;
     input = HuI.getInput(); 
 
@@ -152,22 +165,22 @@ void manual() {
 
 
 void L90() {
-  drive.turn(true, -90);
+  drive.turn(true, -80);
 
 }
 
 void R90() {
-  drive.turn(true, 90);
+  drive.turn(true, 80);
 
 }
 
 void L45() {
-  drive.turn(true, -45); 
+  drive.turn(true, -40); 
 
 }
 
 void R45() {
-  drive.turn(true, 45);
+  drive.turn(true, 40);
 
 }
 
@@ -183,24 +196,42 @@ void UTurn() {
 
 bool goToTurn() {
 
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 30; i++) {
 
     int leftDistance = detection.getDistance(sensorID::Left);
-    Serial.print("Left Distance: ");
-    Serial.println(leftDistance);
+ //   Serial.print("Left Distance: ");
+ //   Serial.println(leftDistance);
     delay(30); 
     int frontDistance = detection.getDistance(sensorID::Front);
-    Serial.print("Front Distance: ");
-    Serial.println(frontDistance);
+   // Serial.print("Front Distance: ");
+   // Serial.println(frontDistance);
     delay(30);
 
     if (leftDistance < 50) { return false; }
     if (frontDistance < 20) { return true; }
-    if (i == 19) { Serial.println("DONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONE"); return true; }
+    if (i == 29) { /*Serial.println("DONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONE"); */ return true; }
 
     }
 }
 
+void goAfterTurn() {
+
+    drive.drive(AUTO_POWER);
+
+    for (int i = 0; i < 30; i++) {
+
+    int frontDistance = detection.getDistance(sensorID::Front);
+ //   Serial.print("Front Distance: ");
+ //   Serial.println(frontDistance);
+    delay(30);
+
+    
+
+    if (frontDistance < 50) { break; }
+    if (i == 29) { /*Serial.println("DONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONEDONE"); */return true; }
+
+    }
+}
 
 
 
@@ -218,14 +249,14 @@ void automatic() {
 
   // If the wall is too close, value = 1;
   //         F  D  L
-  stateArray[0][0][0] = State::L45;
-  stateArray[0][0][1] = State::DoNotChange;
-  stateArray[0][1][0] = State::DoNotChange;
-  stateArray[0][1][1] = State::R45;
-  stateArray[1][0][0] = State::L90;
-  stateArray[1][0][1] = State::R90;
-  stateArray[1][1][0] = State::DoNotChange;
-  stateArray[1][1][1] = State::R90;
+stateArray[0][0][0] = State::L45;
+stateArray[0][0][1] = State::DoNotChange;
+stateArray[0][1][0] = State::R45;
+stateArray[0][1][1] = State::R45; // could be R45
+stateArray[1][0][0] = State::L90;
+stateArray[1][0][1] = State::R90;
+stateArray[1][1][0] = State::DoNotChange;
+stateArray[1][1][1] = State::R90;
 
 
 
@@ -244,16 +275,16 @@ void automatic() {
  
     //take readings from sensors
     int leftDistance = detection.getDistance(sensorID::Left);
-    Serial.print("Left Distance: ");
-    Serial.println(leftDistance);
+   // Serial.print("Left Distance: ");
+  //  Serial.println(leftDistance);
     delay(30); 
     int frontDistance = detection.getDistance(sensorID::Front);
-    Serial.print("Front Distance: ");
-    Serial.println(frontDistance);
+   // Serial.print("Front Distance: ");
+   // Serial.println(frontDistance);
     delay(30);
     int angledDistance = detection.getDistance(sensorID::Angled);
-    Serial.print("Angled Distance: ");   
-    Serial.println(angledDistance);
+   // Serial.print("Angled Distance: ");   
+   // Serial.println(angledDistance);
     delay(30);
 
 
@@ -283,64 +314,71 @@ void automatic() {
       case State::SlightL:
         
         error = abs(leftDistance - MAX_DISTANCE_TO_WALL);
-        tempPower = AUTO_POWER * (1-(error*4/100));
-        drive.drive(tempPower, AUTO_POWER);
+        adjustPower = AUTO_POWER * (1-(error*2/100));
+        drive.drive(adjustPower, AUTO_POWER);
         
-        Serial.println("SLIGHT LEFT");
-        Serial.println(error);
-        Serial.println(tempPower);
+  //      Serial.println("SLIGHT LEFT");
+   //     Serial.println(error);
+   //     Serial.println(tempPower);
         break;
 
       case State::SlightR:
         
         error = abs(leftDistance - MIN_DISTANCE_TO_WALL);
-        tempPower = AUTO_POWER * (1-(error*4/100));
-        drive.drive(AUTO_POWER, tempPower);
+        adjustPower = AUTO_POWER * (1-(error*2/100));
+        drive.drive(AUTO_POWER, adjustPower);
         
-        Serial.println("SLIGHT RIGHT");
-        Serial.println(error);
-        Serial.println(tempPower);
+  //      Serial.println("SLIGHT RIGHT");
+   //     Serial.println(error);
+   //     Serial.println(tempPower);
         break;
 
       case State::L90:
         Serial.println("LEFT 90");
-        if (goToTurn()) { L90(); }
+        if (goToTurn) { L90(); } //goAfterTurn();
+        drive.drive(MAX_POWER);
+        delay(3000);
         detection.resetDistArray();
         break;
 
       case State::R90:
         Serial.println("RIGHT 90");
         goToTurn();
-        R90();
+        //if (goToTurn()) { 
+        R90(); goAfterTurn();// }
         detection.resetDistArray();
         break;
 
       case State::L45:
         Serial.println("LEFT 45");
-        if (goToTurn()) { L45(); }
+        if (goToTurn) { L45(); } //goAfterTurn();
+        drive.drive(MAX_POWER);
+        delay(3000);
         detection.resetDistArray();
+        
+        /*
         int tempAngDist;
         tempAngDist = detection.getDistance(sensorID::Angled);
         if (tempAngDist == 12 || tempAngDist - 1 == 12 || tempAngDist + 1 == 12) {
-          goToTurn();
-          R135();
+        if (goToTurn()) { R135(); goAfterTurn(); }
           detection.resetDistArray();
 
         }
+        */
         break;
 
       case State::R45:
         Serial.println("Right 45");
-        goToTurn();
-        R45();
+        R45(); goAfterTurn();
         detection.resetDistArray();
         break;
 
       case State::R135:
         Serial.println("RIGHT 135");
-        goToTurn();
-        R135();
+        R135(); //goAfterTurn();
         detection.resetDistArray();
+        drive.drive(MAX_POWER);
+        delay(3000);
         break;
 
       case State::UTurn:
@@ -368,6 +406,31 @@ void automatic() {
   }
 }
 
+void known() {
+
+  float block = 3100;//3565;
+
+  drive.drive(MAX_POWER);
+  delay(2 * block);
+  drive.turn(true, 85); 
+   
+  drive.drive(MAX_POWER);
+  delay(4.5 * block);
+  drive.turn(true, 45);
+
+  drive.drive(MAX_POWER);
+  delay(1.3 * block);
+  drive.turn(true, -45);
+
+  drive.drive(MAX_POWER);
+  delay(3 * block);
+  drive.turn(true, 85);
+  
+  drive.drive(MAX_POWER);
+  delay(9999);
+  
+}
+
 void loop() {
 	//robot starts in manual mode and waits for a command. Whenever it is told to leave a mode, it switches to the other one
   /*
@@ -387,6 +450,7 @@ void loop() {
     delay(30);
   */
 	manual();
+ // known();
 	automatic();
 
 }

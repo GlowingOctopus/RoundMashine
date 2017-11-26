@@ -2,7 +2,7 @@
 #include "Config.h"
 
 int Detection::distanceConfig(int dist) {
-  return(dist==0?200:dist-=SENSOR_OFFSET); 
+  return(dist==0?MAX_DISTANCE:dist-=SENSOR_OFFSET); 
   }
 
 //Detection constructor sets up ultrasonic sensors
@@ -16,7 +16,7 @@ Detection::Detection(int trigForward, int trigAngled, int trigLeft, int echoForw
 
 int Detection::ping_mm(sensorID theSensor) {
 
-  int uS; //microseconds
+  int uS; //microseconds for sound to return to sensor
 
   switch(theSensor) {
 
@@ -40,6 +40,7 @@ int Detection::ping_mm(sensorID theSensor) {
 }
 
 void Detection::resetDistArray() {
+
   
   FwdPastDist[0] = distanceConfig(ping_mm(sensorID::Front));
   FwdPastDist[1] = distanceConfig(ping_mm(sensorID::Front));
