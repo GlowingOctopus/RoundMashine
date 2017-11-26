@@ -1,15 +1,15 @@
 #include "Movement.h"
 #include "Config.h"
 
-//Movement constructor (called when a movement object is created
+//Movement constructor (called when a movement object is created)
 Movement::Movement(int L1, int L2, int R1, int R2) {
-	//define the motor outputs
+	//define the outputs to control the motors
 	leftMotor1 = L1;
 	leftMotor2 = L2;
 	rightMotor1 = R1;
 	rightMotor2 = R2;
 
-	//set up the pins
+	//set up the output pins
 	pinMode(leftMotor1, OUTPUT);
 	pinMode(leftMotor2, OUTPUT);
 	pinMode(rightMotor1, OUTPUT);
@@ -26,21 +26,19 @@ Movement::Movement(int L1, int L2, int R1, int R2) {
 #endif //COMPASS
 }
 
-//turn function. onSpot dictates if the robot pivots "on the spot" or around a point on the same side as it is turning towards. _degrees is the angle to turn, - = left, + = right
+//turn method. onSpot dictates if the robot pivots "on the spot" or around a point on the same side as it is turning towards. _degrees is the angle to turn, -ve = left, +ve = right
 void Movement::turn(bool onSpot, int _degrees) {
 
 	if (_degrees != 0) {
-#ifdef COMPASS
+#ifdef COMPASS	//if the compass is defined, it is used to make accurate turns 
 		int counter = 0;
 		int error, errorComplement, mSpeed;
 
 		int targetOrientation = (Compass.GetHeadingDegrees() + _degrees);
 
 		targetOrientation < 0 ? targetOrientation += 360 : targetOrientation %= 360;
-		//Serial.print("Target: ");
-		//Serial.println(targetOrientation);
 
-		while (counter <= 2) {
+		while (counter <= 2) {	//the robot must be within 
 
 			//Serial.print("Facing: ");
 			//Serial.println(Compass.GetHeadingDegrees());

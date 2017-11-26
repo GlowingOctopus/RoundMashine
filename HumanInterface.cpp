@@ -1,5 +1,5 @@
 #include "HumanInterface.h"
-#include "Config.h"
+#include "Config.h"	//include the file with configurable parameters
 
 //check if a new command is available over BT
 bool HumanInterface::checkBT() {
