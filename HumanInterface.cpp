@@ -40,18 +40,18 @@ Command HumanInterface::getInput() {
 	case 'g': // old: C
 		input = Command::Grab;
 		break;
-	case 'q': 
+	case 'q':
 		input = Command::Left45;
 		break;
 	case 'e':
 		input = Command::Right45;
 		break;
-  case 'z':
-    input = Command::TrimLeft;
-    break;
-  case 'x':
-    input = Command::TrimRight;
-    break;
+	case 'z':
+		input = Command::TrimLeft;
+		break;
+	case 'x':
+		input = Command::TrimRight;
+		break;
 	default:
 		input = Command::Stop;
 	}

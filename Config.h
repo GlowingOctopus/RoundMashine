@@ -83,9 +83,9 @@ enum class State { Fwd, SlightR, SlightL, R90, L90, L45, R45, R135, UTurn, Sligh
 
 */
 
- //HARDWARE CONNECTIONS//
- //--------------------//
- //motor connections must be pwm
+//HARDWARE CONNECTIONS//
+//--------------------//
+//motor connections must be pwm
 #define LEFT_MOTOR_1 6  
 #define LEFT_MOTOR_2 9
 #define RIGHT_MOTOR_1 3 

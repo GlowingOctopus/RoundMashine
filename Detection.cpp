@@ -2,60 +2,60 @@
 #include "Config.h"
 
 int Detection::distanceConfig(int dist) {
-  return(dist==0?200:dist-=SENSOR_OFFSET); 
-  }
+	return(dist == 0 ? 200 : dist -= SENSOR_OFFSET);
+}
 
 //Detection constructor sets up ultrasonic sensors
 Detection::Detection(int trigForward, int trigAngled, int trigLeft, int echoForward, int echoAngled, int echoLeft, int maxDistance) : forwardSonar(trigForward, echoForward, maxDistance), angledSonar(trigAngled, echoAngled, maxDistance), leftSonar(trigLeft, echoLeft, maxDistance)
 {
-  resetDistArray();   
+	resetDistArray();
 
-  maxDist = maxDistance;
+	maxDist = maxDistance;
 
 }
 
 int Detection::ping_mm(sensorID theSensor) {
 
-  int uS; //microseconds
+	int uS; //microseconds
 
-  switch(theSensor) {
+	switch (theSensor) {
 
-  case sensorID::Front:
-    uS = forwardSonar.ping();
-    break;
-  case sensorID::Angled:
-    uS = angledSonar.ping();
-    break;
-  case sensorID::Left:
-    uS = leftSonar.ping();
-    break;
-  }
+	case sensorID::Front:
+		uS = forwardSonar.ping();
+		break;
+	case sensorID::Angled:
+		uS = angledSonar.ping();
+		break;
+	case sensorID::Left:
+		uS = leftSonar.ping();
+		break;
+	}
 
-  return int(uS / MICROSECONDS_PER_MM);
+	return int(uS / MICROSECONDS_PER_MM);
 
 
-  
-  
-  
+
+
+
 }
 
 void Detection::resetDistArray() {
-  
-  FwdPastDist[0] = distanceConfig(ping_mm(sensorID::Front));
-  FwdPastDist[1] = distanceConfig(ping_mm(sensorID::Front));
-  FwdPastDist[2] = distanceConfig(ping_mm(sensorID::Front));
-  FwdPastDist[3] = distanceConfig(ping_mm(sensorID::Front));
-  AngledPastDist[0] = distanceConfig(ping_mm(sensorID::Angled));
-  AngledPastDist[1] = distanceConfig(ping_mm(sensorID::Angled));
-  AngledPastDist[2] = distanceConfig(ping_mm(sensorID::Angled));
-  AngledPastDist[3] = distanceConfig(ping_mm(sensorID::Angled));
-  LeftPastDist[0] = distanceConfig(ping_mm(sensorID::Left));
-  LeftPastDist[1] = distanceConfig(ping_mm(sensorID::Left));
-  LeftPastDist[2] = distanceConfig(ping_mm(sensorID::Left));
-  LeftPastDist[3] = distanceConfig(ping_mm(sensorID::Left));
-  
-  
-  }
+
+	FwdPastDist[0] = distanceConfig(ping_mm(sensorID::Front));
+	FwdPastDist[1] = distanceConfig(ping_mm(sensorID::Front));
+	FwdPastDist[2] = distanceConfig(ping_mm(sensorID::Front));
+	FwdPastDist[3] = distanceConfig(ping_mm(sensorID::Front));
+	AngledPastDist[0] = distanceConfig(ping_mm(sensorID::Angled));
+	AngledPastDist[1] = distanceConfig(ping_mm(sensorID::Angled));
+	AngledPastDist[2] = distanceConfig(ping_mm(sensorID::Angled));
+	AngledPastDist[3] = distanceConfig(ping_mm(sensorID::Angled));
+	LeftPastDist[0] = distanceConfig(ping_mm(sensorID::Left));
+	LeftPastDist[1] = distanceConfig(ping_mm(sensorID::Left));
+	LeftPastDist[2] = distanceConfig(ping_mm(sensorID::Left));
+	LeftPastDist[3] = distanceConfig(ping_mm(sensorID::Left));
+
+
+}
 
 
 int Detection::getMedian(int pastVals[], int currentDist) {
@@ -72,13 +72,13 @@ int Detection::getMedian(int pastVals[], int currentDist) {
 		}
 	}
 
-/*   Serial.print("Past array: ");
- for (int i = 0; i < 4; i++) {
-  Serial.print(pastVals[i]);
-  Serial.print(", ");
-  
-  }
-  Serial.println(); */
+	/*   Serial.print("Past array: ");
+	 for (int i = 0; i < 4; i++) {
+	  Serial.print(pastVals[i]);
+	  Serial.print(", ");
+
+	  }
+	  Serial.println(); */
 	return tempArray[2];
 }
 
@@ -88,12 +88,12 @@ int Detection::getDistance(sensorID ID) {
 		int newDist = distanceConfig(ping_mm(sensorID::Front));
 		int dist = getMedian(FwdPastDist, newDist);
 
-    // update array with new val, delete oldest val
-    FwdPastDist[3] = FwdPastDist[2];
-    FwdPastDist[2] = FwdPastDist[1];
-    FwdPastDist[1] = FwdPastDist[0];
-    FwdPastDist[0] = newDist;
-    
+		// update array with new val, delete oldest val
+		FwdPastDist[3] = FwdPastDist[2];
+		FwdPastDist[2] = FwdPastDist[1];
+		FwdPastDist[1] = FwdPastDist[0];
+		FwdPastDist[0] = newDist;
+
 
 		return dist;
 	}
@@ -102,12 +102,12 @@ int Detection::getDistance(sensorID ID) {
 		int dist = getMedian(LeftPastDist, newDist);
 
 
-   // update array with new val, delete oldest val
-    LeftPastDist[3] = LeftPastDist[2];
-    LeftPastDist[2] = LeftPastDist[1];
-    LeftPastDist[1] = LeftPastDist[0];
-    LeftPastDist[0] = newDist;
-    
+		// update array with new val, delete oldest val
+		LeftPastDist[3] = LeftPastDist[2];
+		LeftPastDist[2] = LeftPastDist[1];
+		LeftPastDist[1] = LeftPastDist[0];
+		LeftPastDist[0] = newDist;
+
 		return dist;
 	}
 	if (ID == sensorID::Angled) {
@@ -115,12 +115,12 @@ int Detection::getDistance(sensorID ID) {
 		int dist = getMedian(AngledPastDist, newDist);
 
 
-   // update array with new val, delete oldest val
-    AngledPastDist[3] = AngledPastDist[2];
-    AngledPastDist[2] = AngledPastDist[1];
-    AngledPastDist[1] = AngledPastDist[0];
-    AngledPastDist[0] = newDist;
-    
+		// update array with new val, delete oldest val
+		AngledPastDist[3] = AngledPastDist[2];
+		AngledPastDist[2] = AngledPastDist[1];
+		AngledPastDist[1] = AngledPastDist[0];
+		AngledPastDist[0] = newDist;
+
 		return dist;
 	}
 }
